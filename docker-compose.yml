@@ -3,3 +3,8 @@ services:
     image: postgres:15
     ports:
       - '5432:5432'
+  temporal:
+    image: temporalio/auto-setup:1.26.2
+    ports:
+      - '7233:7233'
+      - '8080:8080'
