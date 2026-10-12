@@ -8,3 +8,9 @@ services:
     ports:
       - '7233:7233'
       - '8080:8080'
+  temporal-ui:
+    image: temporalio/ui:latest
+    ports:
+      - '8088:8088'
+volumes:
+  temporal-postgres-data:
