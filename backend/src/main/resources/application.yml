@@ -1,10 +1,17 @@
 spring:
   application:
     name: aerosaga-backend
-server:
-  port: 8082
+
 temporal:
   client:
     host: localhost
     port: 7233
     namespace: default
+
+server:
+  port: 8082
+
+logging:
+  level:
+    com.aerosaga: INFO
+    io.temporal: INFO
