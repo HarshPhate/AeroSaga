@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: aerosaga-gateway
+
+temporal:
+  client:
+    host: localhost
+    port: 7233
+    namespace: default
+
+server:
+  port: 8081
+
+logging:
+  level:
+    com.aerosaga: INFO
+    io.temporal: INFO
