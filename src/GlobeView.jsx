@@ -1,7 +1,6 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Viewer, Entity, Globe } from "resium";
-import { Cartesian3, Color } from "cesium";
+import { Cartesian3, Color, ArcType } from "cesium";
 
 const drones = [
   {
@@ -30,10 +29,19 @@ const drones = [
   },
 ];
 
+// Ground route: longitude, latitude pairs.
+const routePositions = Cartesian3.fromDegreesArray([
+  80.648, 16.506,
+  80.4365, 16.3067,
+]);
+
+const routeMaterial = Color.fromCssColorString("#2563eb");
+
 function GlobeView() {
   const viewerRef = useRef(null);
   const [progress, setProgress] = useState(0);
 
+  // Animate DRONE-01 independently of the route.
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((previous) => (previous + 0.005) % 2);
@@ -42,22 +50,82 @@ function GlobeView() {
     return () => clearInterval(timer);
   }, []);
 
+  // Set the initial camera position.
   useEffect(() => {
-    const viewer = viewerRef.current?.cesiumElement;
+    let frameId;
 
-    if (!viewer) return;
+    const setCamera = () => {
+      const viewer = viewerRef.current?.cesiumElement;
 
-    viewer.camera.flyTo({
-      destination: Cartesian3.fromDegrees(
-        80.55,
-        16.38,
-        45000,
-      ),
-      duration: 1.5,
-    });
+      if (!viewer || viewer.isDestroyed()) {
+        frameId = requestAnimationFrame(setCamera);
+        return;
+      }
+
+      viewer.camera.flyTo({
+        destination: Cartesian3.fromDegrees(
+          80.55,
+          16.38,
+          45000
+        ),
+        duration: 1.5,
+      });
+    };
+
+    frameId = requestAnimationFrame(setCamera);
+
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
-  const routeProgress = progress <= 1 ? progress : 2 - progress;
+  // Add the delivery route once the Cesium viewer is ready.
+  useEffect(() => {
+    let frameId;
+    let routeEntity;
+
+    const addRoute = () => {
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (!viewer || viewer.isDestroyed()) {
+        frameId = requestAnimationFrame(addRoute);
+        return;
+      }
+
+      routeEntity = viewer.entities.add({
+        name: "Vijayawada to Guntur Delivery Route",
+        polyline: {
+          positions: routePositions,
+          width: 5,
+          material: routeMaterial,
+          arcType: ArcType.GEODESIC,
+          clampToGround: true,
+        },
+      });
+
+      // Ask Cesium to render the scene after adding the route.
+      viewer.scene.requestRender();
+    };
+
+    frameId = requestAnimationFrame(addRoute);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (
+        routeEntity &&
+        viewer &&
+        !viewer.isDestroyed()
+      ) {
+        viewer.entities.remove(routeEntity);
+        viewer.scene.requestRender();
+      }
+    };
+  }, []);
+
+  // Move DRONE-01 forward and then backward.
+  const routeProgress =
+    progress <= 1 ? progress : 2 - progress;
 
   const movingLongitude =
     80.648 + (80.4365 - 80.648) * routeProgress;
@@ -99,7 +167,7 @@ function GlobeView() {
               position={Cartesian3.fromDegrees(
                 longitude,
                 latitude,
-                100,
+                100
               )}
               point={{
                 pixelSize: drone.moving ? 15 : 12,
@@ -112,8 +180,9 @@ function GlobeView() {
                 font: "13px sans-serif",
                 fillColor: Color.WHITE,
                 showBackground: true,
-                backgroundColor:
-                  Color.fromCssColorString("#172033"),
+                backgroundColor: Color.fromCssColorString(
+                  "#172033"
+                ),
                 pixelOffset: new Cartesian3(0, -24, 0),
               }}
             />
