@@ -395,3 +395,11 @@ footer {
   border-radius: 12px;
   background: #eaf2fb;
 }
+.delivery-progress {
+  margin-top: 20px;
+}
+
+.delivery-progress-fill {
+  background: #2563eb;
+  transition: width 0.3s ease;
+}

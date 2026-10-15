@@ -1,4 +1,4 @@
-
+import { useEffect, useState } from "react";
 import "./App.css";
 import GlobeView from "./GlobeView";
 
@@ -23,8 +23,9 @@ const drones = [
   },
 ];
 
-function DroneCard({ drone }) {
+function DroneCard({ drone, progress }) {
   const statusClass = drone.status.toLowerCase().replace(" ", "-");
+  const isMovingDrone = drone.id === "DRONE-01";
 
   return (
     <article className="drone-card">
@@ -51,21 +52,66 @@ function DroneCard({ drone }) {
         />
       </div>
 
+      {isMovingDrone && (
+        <div className="delivery-progress">
+          <div className="battery-heading">
+            <span>Delivery Progress</span>
+            <strong>{progress}%</strong>
+          </div>
+
+          <div
+            className="battery-track"
+            role="progressbar"
+            aria-label="Delivery progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+          >
+            <div
+              className="battery-fill delivery-progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className="location">
+            <span>Vijayawada</span>
+            <strong>Guntur</strong>
+          </div>
+        </div>
+      )}
+
       <div className="location">
         <span>Location</span>
-        <strong>{drone.location}</strong>
+        <strong>
+          {isMovingDrone && progress === 100
+            ? "Guntur"
+            : drone.location}
+        </strong>
       </div>
     </article>
   );
 }
 
 function App() {
+  const [progress, setProgress] = useState(0);
+
+  // Move from 0% to 100%, then repeat the demonstration.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((previous) =>
+        previous >= 100 ? 0 : Math.min(previous + 1, 100)
+      );
+    }, 300);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const inFlight = drones.filter(
-    (drone) => drone.status === "In Flight",
+    (drone) => drone.status === "In Flight"
   ).length;
 
   const disconnected = drones.filter(
-    (drone) => drone.status === "Disconnected",
+    (drone) => drone.status === "Disconnected"
   ).length;
 
   return (
@@ -113,7 +159,7 @@ function App() {
         <h2>Mission Map</h2>
 
         <div className="globe-container">
-          <GlobeView />
+          <GlobeView progress={progress} />
         </div>
       </section>
 
@@ -129,7 +175,11 @@ function App() {
 
         <div className="drone-grid">
           {drones.map((drone) => (
-            <DroneCard key={drone.id} drone={drone} />
+            <DroneCard
+              key={drone.id}
+              drone={drone}
+              progress={progress}
+            />
           ))}
         </div>
       </section>

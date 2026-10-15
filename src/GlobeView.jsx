@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Viewer, Entity, Globe } from "resium";
 import { Cartesian3, Color, ArcType } from "cesium";
 
@@ -29,55 +29,25 @@ const drones = [
   },
 ];
 
-// Ground route: longitude, latitude pairs.
 const routePositions = Cartesian3.fromDegreesArray([
   80.648, 16.506,
   80.4365, 16.3067,
 ]);
 
-const routeMaterial = Color.fromCssColorString("#2563eb");
-
-function GlobeView() {
+function GlobeView({ progress }) {
   const viewerRef = useRef(null);
-  const [progress, setProgress] = useState(0);
 
-  // Animate DRONE-01 independently of the route.
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((previous) => (previous + 0.005) % 2);
-    }, 100);
+    const viewer = viewerRef.current?.cesiumElement;
 
-    return () => clearInterval(timer);
+    if (!viewer || viewer.isDestroyed()) return;
+
+    viewer.camera.flyTo({
+      destination: Cartesian3.fromDegrees(80.55, 16.38, 45000),
+      duration: 1.5,
+    });
   }, []);
 
-  // Set the initial camera position.
-  useEffect(() => {
-    let frameId;
-
-    const setCamera = () => {
-      const viewer = viewerRef.current?.cesiumElement;
-
-      if (!viewer || viewer.isDestroyed()) {
-        frameId = requestAnimationFrame(setCamera);
-        return;
-      }
-
-      viewer.camera.flyTo({
-        destination: Cartesian3.fromDegrees(
-          80.55,
-          16.38,
-          45000
-        ),
-        duration: 1.5,
-      });
-    };
-
-    frameId = requestAnimationFrame(setCamera);
-
-    return () => cancelAnimationFrame(frameId);
-  }, []);
-
-  // Add the delivery route once the Cesium viewer is ready.
   useEffect(() => {
     let frameId;
     let routeEntity;
@@ -95,13 +65,12 @@ function GlobeView() {
         polyline: {
           positions: routePositions,
           width: 5,
-          material: routeMaterial,
+          material: Color.fromCssColorString("#2563eb"),
           arcType: ArcType.GEODESIC,
           clampToGround: true,
         },
       });
 
-      // Ask Cesium to render the scene after adding the route.
       viewer.scene.requestRender();
     };
 
@@ -123,9 +92,10 @@ function GlobeView() {
     };
   }, []);
 
-  // Move DRONE-01 forward and then backward.
-  const routeProgress =
-    progress <= 1 ? progress : 2 - progress;
+  const routeProgress = Math.max(
+    0,
+    Math.min(1, progress / 100)
+  );
 
   const movingLongitude =
     80.648 + (80.4365 - 80.648) * routeProgress;
