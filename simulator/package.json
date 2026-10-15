@@ -1,0 +1,10 @@
+{
+  "name": "aerosaga-simulator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mock drone simulator for AeroSaga - emits GPS pings and storm events",
+  "dependencies": {
+    "ws": "^8.16.0",
+    "uuid": "^9.0.1"
+  }
+}
