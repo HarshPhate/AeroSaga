@@ -1,4 +1,4 @@
-
+import { useEffect, useState } from "react";
 import "./App.css";
 import GlobeView from "./GlobeView";
 
@@ -23,8 +23,9 @@ const drones = [
   },
 ];
 
-function DroneCard({ drone }) {
+function DroneCard({ drone, progress }) {
   const statusClass = drone.status.toLowerCase().replace(" ", "-");
+  const isMovingDrone = drone.id === "DRONE-01";
 
   return (
     <article className="drone-card">
@@ -35,7 +36,9 @@ function DroneCard({ drone }) {
         </div>
 
         <span className={`status ${statusClass}`}>
-          {drone.status}
+          {isMovingDrone && progress === 100
+            ? "Delivered"
+            : drone.status}
         </span>
       </div>
 
@@ -51,21 +54,136 @@ function DroneCard({ drone }) {
         />
       </div>
 
+      {isMovingDrone && (
+        <div className="delivery-progress">
+          <div className="battery-heading">
+            <span>Delivery Progress</span>
+            <strong>{progress}%</strong>
+          </div>
+
+          <div
+            className="battery-track"
+            role="progressbar"
+            aria-label="Delivery progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+          >
+            <div
+              className="battery-fill delivery-progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className="location">
+            <span>Vijayawada</span>
+            <strong>Guntur</strong>
+          </div>
+        </div>
+      )}
+
       <div className="location">
         <span>Location</span>
-        <strong>{drone.location}</strong>
+        <strong>
+          {isMovingDrone
+            ? progress === 100
+              ? "Guntur"
+              : progress > 0
+                ? "En route to Guntur"
+                : "Vijayawada"
+            : drone.location}
+        </strong>
       </div>
     </article>
   );
 }
 
+function MissionTimeline({ progress }) {
+  const delivered = progress === 100;
+
+  const steps = [
+    {
+      title: "Mission Created",
+      description: "Delivery request registered.",
+      complete: true,
+    },
+    {
+      title: "Drone Dispatched",
+      description: "DRONE-01 started its simulated mission.",
+      complete: true,
+    },
+    {
+      title: "Delivery in Progress",
+      description: delivered
+        ? "Drone has reached its destination."
+        : `Delivery is ${progress}% complete.`,
+      complete: delivered,
+      active: !delivered,
+    },
+    {
+      title: "Destination Reached",
+      description: delivered
+        ? "Delivery successfully completed."
+        : "Waiting for the drone to reach Guntur.",
+      complete: delivered,
+      active: false,
+    },
+  ];
+
+  return (
+    <section className="timeline-panel">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">MISSION ACTIVITY</p>
+          <h2>Delivery Timeline</h2>
+        </div>
+
+        <span>{delivered ? "Completed" : "Mission Active"}</span>
+      </div>
+
+      <div className="mission-timeline">
+        {steps.map((step, index) => (
+          <div
+            className={`timeline-step ${
+              step.complete ? "completed" : ""
+            } ${step.active ? "active" : ""}`}
+            key={step.title}
+          >
+            <div className="timeline-marker">
+              {step.complete ? "✓" : index + 1}
+            </div>
+
+            <div className="timeline-content">
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function App() {
+  const [progress, setProgress] = useState(0);
+
+  // Simulate delivery progress from 0% to 100%.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((previous) =>
+        previous >= 100 ? 0 : Math.min(previous + 1, 100)
+      );
+    }, 300);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const inFlight = drones.filter(
-    (drone) => drone.status === "In Flight",
+    (drone) => drone.status === "In Flight"
   ).length;
 
   const disconnected = drones.filter(
-    (drone) => drone.status === "Disconnected",
+    (drone) => drone.status === "Disconnected"
   ).length;
 
   return (
@@ -99,7 +217,7 @@ function App() {
 
         <div className="summary-card">
           <span>In Flight</span>
-          <strong>{inFlight}</strong>
+          <strong>{progress === 100 ? 0 : inFlight}</strong>
         </div>
 
         <div className="summary-card">
@@ -113,9 +231,11 @@ function App() {
         <h2>Mission Map</h2>
 
         <div className="globe-container">
-          <GlobeView />
+          <GlobeView progress={progress} />
         </div>
       </section>
+
+      <MissionTimeline progress={progress} />
 
       <section className="fleet-section">
         <div className="section-heading">
@@ -129,7 +249,11 @@ function App() {
 
         <div className="drone-grid">
           {drones.map((drone) => (
-            <DroneCard key={drone.id} drone={drone} />
+            <DroneCard
+              key={drone.id}
+              drone={drone}
+              progress={progress}
+            />
           ))}
         </div>
       </section>

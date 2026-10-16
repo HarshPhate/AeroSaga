@@ -395,3 +395,97 @@ footer {
   border-radius: 12px;
   background: #eaf2fb;
 }
+.delivery-progress {
+  margin-top: 20px;
+}
+
+.delivery-progress-fill {
+  background: #2563eb;
+  transition: width 0.3s ease;
+}
+/* Day 6: Mission Activity Timeline */
+
+.timeline-panel {
+  margin-top: 28px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.mission-timeline {
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+}
+
+.timeline-step {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  min-height: 88px;
+}
+
+.timeline-step:not(:last-child)::before {
+  position: absolute;
+  top: 38px;
+  left: 17px;
+  width: 2px;
+  height: calc(100% - 18px);
+  background: #e2e8f0;
+  content: "";
+}
+
+.timeline-step.completed:not(:last-child)::before {
+  background: #22c55e;
+}
+
+.timeline-marker {
+  z-index: 1;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.timeline-step.completed .timeline-marker {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.timeline-step.active .timeline-marker {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.timeline-content {
+  padding-bottom: 24px;
+}
+
+.timeline-content h3 {
+  margin: 4px 0 6px;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.timeline-content p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .timeline-panel {
+    padding: 20px;
+  }
+}

@@ -1,7 +1,6 @@
-
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Viewer, Entity, Globe } from "resium";
-import { Cartesian3, Color } from "cesium";
+import { Cartesian3, Color, ArcType } from "cesium";
 
 const drones = [
   {
@@ -30,34 +29,73 @@ const drones = [
   },
 ];
 
-function GlobeView() {
+const routePositions = Cartesian3.fromDegreesArray([
+  80.648, 16.506,
+  80.4365, 16.3067,
+]);
+
+function GlobeView({ progress }) {
   const viewerRef = useRef(null);
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((previous) => (previous + 0.005) % 2);
-    }, 100);
-
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     const viewer = viewerRef.current?.cesiumElement;
 
-    if (!viewer) return;
+    if (!viewer || viewer.isDestroyed()) return;
 
     viewer.camera.flyTo({
-      destination: Cartesian3.fromDegrees(
-        80.55,
-        16.38,
-        45000,
-      ),
+      destination: Cartesian3.fromDegrees(80.55, 16.38, 45000),
       duration: 1.5,
     });
   }, []);
 
-  const routeProgress = progress <= 1 ? progress : 2 - progress;
+  useEffect(() => {
+    let frameId;
+    let routeEntity;
+
+    const addRoute = () => {
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (!viewer || viewer.isDestroyed()) {
+        frameId = requestAnimationFrame(addRoute);
+        return;
+      }
+
+      routeEntity = viewer.entities.add({
+        name: "Vijayawada to Guntur Delivery Route",
+        polyline: {
+          positions: routePositions,
+          width: 5,
+          material: Color.fromCssColorString("#2563eb"),
+          arcType: ArcType.GEODESIC,
+          clampToGround: true,
+        },
+      });
+
+      viewer.scene.requestRender();
+    };
+
+    frameId = requestAnimationFrame(addRoute);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (
+        routeEntity &&
+        viewer &&
+        !viewer.isDestroyed()
+      ) {
+        viewer.entities.remove(routeEntity);
+        viewer.scene.requestRender();
+      }
+    };
+  }, []);
+
+  const routeProgress = Math.max(
+    0,
+    Math.min(1, progress / 100)
+  );
 
   const movingLongitude =
     80.648 + (80.4365 - 80.648) * routeProgress;
@@ -99,7 +137,7 @@ function GlobeView() {
               position={Cartesian3.fromDegrees(
                 longitude,
                 latitude,
-                100,
+                100
               )}
               point={{
                 pixelSize: drone.moving ? 15 : 12,
@@ -112,8 +150,9 @@ function GlobeView() {
                 font: "13px sans-serif",
                 fillColor: Color.WHITE,
                 showBackground: true,
-                backgroundColor:
-                  Color.fromCssColorString("#172033"),
+                backgroundColor: Color.fromCssColorString(
+                  "#172033"
+                ),
                 pixelOffset: new Cartesian3(0, -24, 0),
               }}
             />
