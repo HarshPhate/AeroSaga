@@ -36,7 +36,9 @@ function DroneCard({ drone, progress }) {
         </div>
 
         <span className={`status ${statusClass}`}>
-          {drone.status}
+          {isMovingDrone && progress === 100
+            ? "Delivered"
+            : drone.status}
         </span>
       </div>
 
@@ -83,8 +85,12 @@ function DroneCard({ drone, progress }) {
       <div className="location">
         <span>Location</span>
         <strong>
-          {isMovingDrone && progress === 100
-            ? "Guntur"
+          {isMovingDrone
+            ? progress === 100
+              ? "Guntur"
+              : progress > 0
+                ? "En route to Guntur"
+                : "Vijayawada"
             : drone.location}
         </strong>
       </div>
@@ -92,10 +98,76 @@ function DroneCard({ drone, progress }) {
   );
 }
 
+function MissionTimeline({ progress }) {
+  const delivered = progress === 100;
+
+  const steps = [
+    {
+      title: "Mission Created",
+      description: "Delivery request registered.",
+      complete: true,
+    },
+    {
+      title: "Drone Dispatched",
+      description: "DRONE-01 started its simulated mission.",
+      complete: true,
+    },
+    {
+      title: "Delivery in Progress",
+      description: delivered
+        ? "Drone has reached its destination."
+        : `Delivery is ${progress}% complete.`,
+      complete: delivered,
+      active: !delivered,
+    },
+    {
+      title: "Destination Reached",
+      description: delivered
+        ? "Delivery successfully completed."
+        : "Waiting for the drone to reach Guntur.",
+      complete: delivered,
+      active: false,
+    },
+  ];
+
+  return (
+    <section className="timeline-panel">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">MISSION ACTIVITY</p>
+          <h2>Delivery Timeline</h2>
+        </div>
+
+        <span>{delivered ? "Completed" : "Mission Active"}</span>
+      </div>
+
+      <div className="mission-timeline">
+        {steps.map((step, index) => (
+          <div
+            className={`timeline-step ${
+              step.complete ? "completed" : ""
+            } ${step.active ? "active" : ""}`}
+            key={step.title}
+          >
+            <div className="timeline-marker">
+              {step.complete ? "✓" : index + 1}
+            </div>
+
+            <div className="timeline-content">
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const [progress, setProgress] = useState(0);
 
-  // Move from 0% to 100%, then repeat the demonstration.
+  // Simulate delivery progress from 0% to 100%.
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((previous) =>
@@ -145,7 +217,7 @@ function App() {
 
         <div className="summary-card">
           <span>In Flight</span>
-          <strong>{inFlight}</strong>
+          <strong>{progress === 100 ? 0 : inFlight}</strong>
         </div>
 
         <div className="summary-card">
@@ -162,6 +234,8 @@ function App() {
           <GlobeView progress={progress} />
         </div>
       </section>
+
+      <MissionTimeline progress={progress} />
 
       <section className="fleet-section">
         <div className="section-heading">
