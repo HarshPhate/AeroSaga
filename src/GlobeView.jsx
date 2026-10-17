@@ -1,6 +1,12 @@
+
 import { useEffect, useRef } from "react";
 import { Viewer, Entity, Globe } from "resium";
-import { Cartesian3, Color, ArcType } from "cesium";
+import {
+  Cartesian3,
+  Color,
+  ArcType,
+  UrlTemplateImageryProvider,
+} from "cesium";
 
 const drones = [
   {
@@ -37,22 +43,99 @@ const routePositions = Cartesian3.fromDegreesArray([
 function GlobeView({ progress }) {
   const viewerRef = useRef(null);
 
+  // Load satellite imagery.
   useEffect(() => {
-    const viewer = viewerRef.current?.cesiumElement;
+    let frameId;
+    let cancelled = false;
+    let satelliteLayer;
 
-    if (!viewer || viewer.isDestroyed()) return;
+    const setupImagery = () => {
+      if (cancelled) return;
 
-    viewer.camera.flyTo({
-      destination: Cartesian3.fromDegrees(80.55, 16.38, 45000),
-      duration: 1.5,
-    });
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (!viewer || viewer.isDestroyed()) {
+        frameId = requestAnimationFrame(setupImagery);
+        return;
+      }
+
+      // Remove default imagery before adding satellite tiles.
+      viewer.imageryLayers.removeAll();
+
+      const satelliteProvider = new UrlTemplateImageryProvider({
+        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        credit: "Tiles © Esri",
+        maximumLevel: 19,
+      });
+
+      satelliteLayer =
+        viewer.imageryLayers.addImageryProvider(
+          satelliteProvider
+        );
+
+      viewer.scene.requestRender();
+    };
+
+    frameId = requestAnimationFrame(setupImagery);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frameId);
+
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (
+        viewer &&
+        !viewer.isDestroyed() &&
+        satelliteLayer
+      ) {
+        viewer.imageryLayers.remove(satelliteLayer, true);
+      }
+    };
   }, []);
 
+  // Zoom into the drone delivery region.
+  useEffect(() => {
+    let frameId;
+    let cancelled = false;
+
+    const setCamera = () => {
+      if (cancelled) return;
+
+      const viewer = viewerRef.current?.cesiumElement;
+
+      if (!viewer || viewer.isDestroyed()) {
+        frameId = requestAnimationFrame(setCamera);
+        return;
+      }
+
+      viewer.camera.flyTo({
+        destination: Cartesian3.fromDegrees(
+          80.55,
+          16.38,
+          350000
+        ),
+        duration: 1.5,
+      });
+    };
+
+    frameId = requestAnimationFrame(setCamera);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frameId);
+    };
+  }, []);
+
+  // Add the delivery route.
   useEffect(() => {
     let frameId;
     let routeEntity;
+    let cancelled = false;
 
     const addRoute = () => {
+      if (cancelled) return;
+
       const viewer = viewerRef.current?.cesiumElement;
 
       if (!viewer || viewer.isDestroyed()) {
@@ -77,6 +160,7 @@ function GlobeView({ progress }) {
     frameId = requestAnimationFrame(addRoute);
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(frameId);
 
       const viewer = viewerRef.current?.cesiumElement;
@@ -92,9 +176,10 @@ function GlobeView({ progress }) {
     };
   }, []);
 
+  // Animate DRONE-01 using mission progress.
   const routeProgress = Math.max(
     0,
-    Math.min(1, progress / 100)
+    Math.min(1, (progress ?? 0) / 100)
   );
 
   const movingLongitude =
@@ -118,7 +203,7 @@ function GlobeView({ progress }) {
         fullscreenButton={false}
         style={{ height: "100%", width: "100%" }}
       >
-        <Globe enableLighting />
+        <Globe enableLighting={false} />
 
         {drones.map((drone) => {
           const longitude = drone.moving
