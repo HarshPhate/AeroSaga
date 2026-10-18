@@ -489,3 +489,30 @@ footer {
     padding: 20px;
   }
 }
+
+.mission-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.mission-controls button {
+  padding: 11px 18px;
+  border: 1px solid #2563eb;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mission-controls button:hover {
+  background: #1d4ed8;
+}
+
+.mission-controls button:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}

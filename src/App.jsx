@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import "./App.css";
 import GlobeView from "./GlobeView";
@@ -23,9 +24,21 @@ const drones = [
   },
 ];
 
-function DroneCard({ drone, progress }) {
-  const statusClass = drone.status.toLowerCase().replace(" ", "-");
+function DroneCard({ drone, progress, missionStatus }) {
   const isMovingDrone = drone.id === "DRONE-01";
+
+  const displayedStatus = isMovingDrone
+    ? missionStatus === "completed"
+      ? "Delivered"
+      : missionStatus === "in-progress" ||
+          missionStatus === "paused"
+        ? "In Flight"
+        : "Ready"
+    : drone.status;
+
+  const statusClass = displayedStatus
+    .toLowerCase()
+    .replace(" ", "-");
 
   return (
     <article className="drone-card">
@@ -36,9 +49,7 @@ function DroneCard({ drone, progress }) {
         </div>
 
         <span className={`status ${statusClass}`}>
-          {isMovingDrone && progress === 100
-            ? "Delivered"
-            : drone.status}
+          {displayedStatus}
         </span>
       </div>
 
@@ -88,7 +99,8 @@ function DroneCard({ drone, progress }) {
           {isMovingDrone
             ? progress === 100
               ? "Guntur"
-              : progress > 0
+              : missionStatus === "in-progress" ||
+                  missionStatus === "paused"
                 ? "En route to Guntur"
                 : "Vijayawada"
             : drone.location}
@@ -98,8 +110,8 @@ function DroneCard({ drone, progress }) {
   );
 }
 
-function MissionTimeline({ progress }) {
-  const delivered = progress === 100;
+function MissionTimeline({ progress, missionStatus }) {
+  const delivered = missionStatus === "completed";
 
   const steps = [
     {
@@ -109,16 +121,23 @@ function MissionTimeline({ progress }) {
     },
     {
       title: "Drone Dispatched",
-      description: "DRONE-01 started its simulated mission.",
-      complete: true,
+      description: delivered || progress > 0
+        ? "DRONE-01 has started its simulated mission."
+        : "Waiting for mission start.",
+      complete: delivered || progress > 0,
+      active: missionStatus === "in-progress" && progress === 0,
     },
     {
       title: "Delivery in Progress",
       description: delivered
         ? "Drone has reached its destination."
-        : `Delivery is ${progress}% complete.`,
+        : missionStatus === "paused"
+          ? `Mission paused at ${progress}%.`
+          : missionStatus === "in-progress"
+            ? `Delivery is ${progress}% complete.`
+            : "Waiting for the mission to start.",
       complete: delivered,
-      active: !delivered,
+      active: missionStatus === "in-progress",
     },
     {
       title: "Destination Reached",
@@ -126,7 +145,6 @@ function MissionTimeline({ progress }) {
         ? "Delivery successfully completed."
         : "Waiting for the drone to reach Guntur.",
       complete: delivered,
-      active: false,
     },
   ];
 
@@ -138,7 +156,15 @@ function MissionTimeline({ progress }) {
           <h2>Delivery Timeline</h2>
         </div>
 
-        <span>{delivered ? "Completed" : "Mission Active"}</span>
+        <span>
+          {missionStatus === "completed"
+            ? "Completed"
+            : missionStatus === "paused"
+              ? "Paused"
+              : missionStatus === "in-progress"
+                ? "Mission Active"
+                : "Ready to Start"}
+        </span>
       </div>
 
       <div className="mission-timeline">
@@ -166,21 +192,50 @@ function MissionTimeline({ progress }) {
 
 function App() {
   const [progress, setProgress] = useState(0);
+  const [missionStatus, setMissionStatus] = useState("ready");
 
-  // Simulate delivery progress from 0% to 100%.
+  // Advance progress only while the mission is running.
   useEffect(() => {
+    if (missionStatus !== "in-progress") return;
+
     const timer = setInterval(() => {
-      setProgress((previous) =>
-        previous >= 100 ? 0 : Math.min(previous + 1, 100)
-      );
+      setProgress((previous) => {
+        const next = Math.min(previous + 1, 100);
+
+        if (next === 100) {
+          setMissionStatus("completed");
+        }
+
+        return next;
+      });
     }, 300);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [missionStatus]);
 
-  const inFlight = drones.filter(
-    (drone) => drone.status === "In Flight"
-  ).length;
+  const startMission = () => {
+    setProgress(0);
+    setMissionStatus("in-progress");
+  };
+
+  const pauseMission = () => {
+    setMissionStatus("paused");
+  };
+
+  const resumeMission = () => {
+    setMissionStatus("in-progress");
+  };
+
+  const completeMission = () => {
+    setProgress(100);
+    setMissionStatus("completed");
+  };
+
+  const inFlight =
+    missionStatus === "in-progress" ||
+    missionStatus === "paused"
+      ? 1
+      : 0;
 
   const disconnected = drones.filter(
     (drone) => drone.status === "Disconnected"
@@ -217,7 +272,7 @@ function App() {
 
         <div className="summary-card">
           <span>In Flight</span>
-          <strong>{progress === 100 ? 0 : inFlight}</strong>
+          <strong>{inFlight}</strong>
         </div>
 
         <div className="summary-card">
@@ -235,7 +290,56 @@ function App() {
         </div>
       </section>
 
-      <MissionTimeline progress={progress} />
+      <section className="timeline-panel">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">MISSION CONTROL</p>
+            <h2>Delivery Controls</h2>
+          </div>
+
+          <span>
+            {missionStatus.replace("-", " ").toUpperCase()}
+          </span>
+        </div>
+
+        <div className="mission-controls">
+          {missionStatus === "ready" && (
+            <button onClick={startMission}>
+              Start Mission
+            </button>
+          )}
+
+          {missionStatus === "in-progress" && (
+            <button onClick={pauseMission}>
+              Pause Mission
+            </button>
+          )}
+
+          {missionStatus === "paused" && (
+            <button onClick={resumeMission}>
+              Resume Mission
+            </button>
+          )}
+
+          {(missionStatus === "in-progress" ||
+            missionStatus === "paused") && (
+            <button onClick={completeMission}>
+              Complete Mission
+            </button>
+          )}
+
+          {missionStatus === "completed" && (
+            <button onClick={startMission}>
+              Start New Mission
+            </button>
+          )}
+        </div>
+      </section>
+
+      <MissionTimeline
+        progress={progress}
+        missionStatus={missionStatus}
+      />
 
       <section className="fleet-section">
         <div className="section-heading">
@@ -253,6 +357,7 @@ function App() {
               key={drone.id}
               drone={drone}
               progress={progress}
+              missionStatus={missionStatus}
             />
           ))}
         </div>
