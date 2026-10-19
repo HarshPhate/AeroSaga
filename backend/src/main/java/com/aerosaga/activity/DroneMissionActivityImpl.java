@@ -55,4 +55,4 @@ public class DroneMissionActivityImpl implements DroneMissionActivity {
     }
     log.info("Arrived at base");
   }
-}
+} // simulated navigation
