@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Viewer, Entity, Globe } from "resium";
 import {
   Cartesian3,
@@ -8,14 +8,20 @@ import {
   UrlTemplateImageryProvider,
 } from "cesium";
 
-const drones = [
+// Coordinates for locations supported by this demo.
+const locations = {
+  vijayawada: { longitude: 80.648, latitude: 16.506 },
+  guntur: { longitude: 80.4365, latitude: 16.3067 },
+  tenali: { longitude: 80.64, latitude: 16.243 },
+};
+
+const fleet = [
   {
     id: "DRONE-01",
     location: "Vijayawada",
     longitude: 80.648,
     latitude: 16.506,
     color: Color.LIME,
-    moving: true,
   },
   {
     id: "DRONE-02",
@@ -23,7 +29,6 @@ const drones = [
     longitude: 80.4365,
     latitude: 16.3067,
     color: Color.DODGERBLUE,
-    moving: false,
   },
   {
     id: "DRONE-03",
@@ -31,23 +36,84 @@ const drones = [
     longitude: 80.64,
     latitude: 16.243,
     color: Color.ORANGE,
-    moving: false,
   },
 ];
 
-const routePositions = Cartesian3.fromDegreesArray([
-  80.648, 16.506,
-  80.4365, 16.3067,
-]);
+function findLocation(name, fallback) {
+  if (!name) return fallback;
 
-function GlobeView({ progress }) {
+  return locations[name.trim().toLowerCase()] ?? fallback;
+}
+
+function GlobeView({
+  progress = 0,
+  mission = null,
+  height = 420,
+  showFleet,
+}) {
   const viewerRef = useRef(null);
 
-  // Load satellite imagery.
+  // When a mission is supplied, render its route.
+  // Otherwise, render the overview fleet map.
+  const isMissionView = Boolean(mission);
+  const displayFleet = showFleet ?? !isMissionView;
+
+  const droneId =
+    mission?.droneId ??
+    mission?.selectedDrone ??
+    mission?.drone?.id ??
+    "DRONE-01";
+
+  const pickupName =
+    mission?.pickupLocation ??
+    mission?.pickup ??
+    mission?.startPoint ??
+    "Vijayawada";
+
+  const destinationName =
+    mission?.deliveryLocation ??
+    mission?.destination ??
+    mission?.endPoint ??
+    "Guntur";
+
+  const pickup = findLocation(
+    pickupName,
+    locations.vijayawada
+  );
+
+  const destination = findLocation(
+    destinationName,
+    locations.guntur
+  );
+
+  const routeProgress = Math.max(
+    0,
+    Math.min(100, Number(progress) || 0)
+  ) / 100;
+
+  const currentPosition = useMemo(
+    () => ({
+      longitude:
+        pickup.longitude +
+        (destination.longitude - pickup.longitude) *
+          routeProgress,
+      latitude:
+        pickup.latitude +
+        (destination.latitude - pickup.latitude) *
+          routeProgress,
+    }),
+    [
+      pickup.longitude,
+      pickup.latitude,
+      destination.longitude,
+      destination.latitude,
+      routeProgress,
+    ]
+  );
+
   useEffect(() => {
     let frameId;
     let cancelled = false;
-    let satelliteLayer;
 
     const setupImagery = () => {
       if (cancelled) return;
@@ -59,20 +125,16 @@ function GlobeView({ progress }) {
         return;
       }
 
-      // Remove default imagery before adding satellite tiles.
       viewer.imageryLayers.removeAll();
 
-      const satelliteProvider = new UrlTemplateImageryProvider({
-        url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      const provider = new UrlTemplateImageryProvider({
+        url:
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         credit: "Tiles © Esri",
         maximumLevel: 19,
       });
 
-      satelliteLayer =
-        viewer.imageryLayers.addImageryProvider(
-          satelliteProvider
-        );
-
+      viewer.imageryLayers.addImageryProvider(provider);
       viewer.scene.requestRender();
     };
 
@@ -81,20 +143,10 @@ function GlobeView({ progress }) {
     return () => {
       cancelled = true;
       cancelAnimationFrame(frameId);
-
-      const viewer = viewerRef.current?.cesiumElement;
-
-      if (
-        viewer &&
-        !viewer.isDestroyed() &&
-        satelliteLayer
-      ) {
-        viewer.imageryLayers.remove(satelliteLayer, true);
-      }
     };
   }, []);
 
-  // Zoom into the drone delivery region.
+  // Fly to the selected mission, or show the full fleet.
   useEffect(() => {
     let frameId;
     let cancelled = false;
@@ -109,14 +161,30 @@ function GlobeView({ progress }) {
         return;
       }
 
-      viewer.camera.flyTo({
-        destination: Cartesian3.fromDegrees(
-          80.55,
-          16.38,
-          350000
-        ),
-        duration: 1.5,
-      });
+      if (isMissionView) {
+        const centerLongitude =
+          (pickup.longitude + destination.longitude) / 2;
+        const centerLatitude =
+          (pickup.latitude + destination.latitude) / 2;
+
+        viewer.camera.flyTo({
+          destination: Cartesian3.fromDegrees(
+            centerLongitude,
+            centerLatitude,
+            45000
+          ),
+          duration: 1,
+        });
+      } else {
+        viewer.camera.flyTo({
+          destination: Cartesian3.fromDegrees(
+            80.55,
+            16.38,
+            350000
+          ),
+          duration: 1,
+        });
+      }
     };
 
     frameId = requestAnimationFrame(setCamera);
@@ -125,71 +193,23 @@ function GlobeView({ progress }) {
       cancelled = true;
       cancelAnimationFrame(frameId);
     };
-  }, []);
+  }, [
+    isMissionView,
+    pickup.longitude,
+    pickup.latitude,
+    destination.longitude,
+    destination.latitude,
+  ]);
 
-  // Add the delivery route.
-  useEffect(() => {
-    let frameId;
-    let routeEntity;
-    let cancelled = false;
-
-    const addRoute = () => {
-      if (cancelled) return;
-
-      const viewer = viewerRef.current?.cesiumElement;
-
-      if (!viewer || viewer.isDestroyed()) {
-        frameId = requestAnimationFrame(addRoute);
-        return;
-      }
-
-      routeEntity = viewer.entities.add({
-        name: "Vijayawada to Guntur Delivery Route",
-        polyline: {
-          positions: routePositions,
-          width: 5,
-          material: Color.fromCssColorString("#2563eb"),
-          arcType: ArcType.GEODESIC,
-          clampToGround: true,
-        },
-      });
-
-      viewer.scene.requestRender();
-    };
-
-    frameId = requestAnimationFrame(addRoute);
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(frameId);
-
-      const viewer = viewerRef.current?.cesiumElement;
-
-      if (
-        routeEntity &&
-        viewer &&
-        !viewer.isDestroyed()
-      ) {
-        viewer.entities.remove(routeEntity);
-        viewer.scene.requestRender();
-      }
-    };
-  }, []);
-
-  // Animate DRONE-01 using mission progress.
-  const routeProgress = Math.max(
-    0,
-    Math.min(1, (progress ?? 0) / 100)
-  );
-
-  const movingLongitude =
-    80.648 + (80.4365 - 80.648) * routeProgress;
-
-  const movingLatitude =
-    16.506 + (16.3067 - 16.506) * routeProgress;
+  const routePositions = Cartesian3.fromDegreesArray([
+    pickup.longitude,
+    pickup.latitude,
+    destination.longitude,
+    destination.latitude,
+  ]);
 
   return (
-    <div style={{ height: "420px", width: "100%" }}>
+    <div style={{ height, width: "100%", overflow: "hidden" }}>
       <Viewer
         ref={viewerRef}
         full={false}
@@ -205,27 +225,108 @@ function GlobeView({ progress }) {
       >
         <Globe enableLighting={false} />
 
-        {drones.map((drone) => {
-          const longitude = drone.moving
-            ? movingLongitude
-            : drone.longitude;
+        {/* Full pickup-to-destination route */}
+        <Entity
+          name={`${pickupName} to ${destinationName} route`}
+          polyline={{
+            positions: routePositions,
+            width: 5,
+            material: Color.fromCssColorString("#2563eb"),
+            arcType: ArcType.GEODESIC,
+            clampToGround: true,
+          }}
+        />
 
-          const latitude = drone.moving
-            ? movingLatitude
-            : drone.latitude;
+        {/* Pickup marker */}
+        <Entity
+          name={`Pickup: ${pickupName}`}
+          position={Cartesian3.fromDegrees(
+            pickup.longitude,
+            pickup.latitude,
+            50
+          )}
+          point={{
+            pixelSize: 12,
+            color: Color.LIME,
+            outlineColor: Color.WHITE,
+            outlineWidth: 2,
+          }}
+          label={{
+            text: `PICKUP: ${pickupName}`,
+            font: "13px sans-serif",
+            fillColor: Color.WHITE,
+            showBackground: true,
+            backgroundColor: Color.fromCssColorString("#172033"),
+            pixelOffset: new Cartesian3(0, -22, 0),
+          }}
+        />
 
-          return (
+        {/* Destination marker */}
+        <Entity
+          name={`Destination: ${destinationName}`}
+          position={Cartesian3.fromDegrees(
+            destination.longitude,
+            destination.latitude,
+            50
+          )}
+          point={{
+            pixelSize: 12,
+            color: Color.RED,
+            outlineColor: Color.WHITE,
+            outlineWidth: 2,
+          }}
+          label={{
+            text: `DESTINATION: ${destinationName}`,
+            font: "13px sans-serif",
+            fillColor: Color.WHITE,
+            showBackground: true,
+            backgroundColor: Color.fromCssColorString("#172033"),
+            pixelOffset: new Cartesian3(0, -22, 0),
+          }}
+        />
+
+        {isMissionView ? (
+          /* Only the selected mission's drone */
+          <Entity
+            name={droneId}
+            position={Cartesian3.fromDegrees(
+              routeProgress >= 1
+                ? destination.longitude
+                : currentPosition.longitude,
+              routeProgress >= 1
+                ? destination.latitude
+                : currentPosition.latitude,
+              100
+            )}
+            point={{
+              pixelSize: 16,
+              color: Color.DODGERBLUE,
+              outlineColor: Color.WHITE,
+              outlineWidth: 3,
+            }}
+            label={{
+              text: `${droneId} · ${routeProgress * 100}%`,
+              font: "13px sans-serif",
+              fillColor: Color.WHITE,
+              showBackground: true,
+              backgroundColor: Color.fromCssColorString("#172033"),
+              pixelOffset: new Cartesian3(0, -25, 0),
+            }}
+          />
+        ) : (
+          /* All drones on the overview map */
+          fleet.map((drone) => (
             <Entity
               key={drone.id}
               name={drone.id}
               description={`Location: ${drone.location}`}
               position={Cartesian3.fromDegrees(
-                longitude,
-                latitude,
+                drone.longitude,
+                drone.latitude,
                 100
               )}
               point={{
-                pixelSize: drone.moving ? 15 : 12,
+                pixelSize: 13,
                 color: drone.color,
                 outlineColor: Color.WHITE,
                 outlineWidth: 2,
@@ -235,14 +336,13 @@ function GlobeView({ progress }) {
                 font: "13px sans-serif",
                 fillColor: Color.WHITE,
                 showBackground: true,
-                backgroundColor: Color.fromCssColorString(
-                  "#172033"
-                ),
+                backgroundColor:
+                  Color.fromCssColorString("#172033"),
                 pixelOffset: new Cartesian3(0, -24, 0),
               }}
             />
-          );
-        })}
+          ))
+        )}
       </Viewer>
     </div>
   );
