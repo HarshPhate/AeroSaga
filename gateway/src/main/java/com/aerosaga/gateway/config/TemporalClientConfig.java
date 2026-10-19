@@ -29,4 +29,4 @@ public class TemporalClientConfig {
         .build();
     return WorkflowClient.newInstance(workflowServiceStubs, options);
   }
-}
+} // connection timeout
