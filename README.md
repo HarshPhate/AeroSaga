@@ -7,3 +7,5 @@ Problem Statement: Standard Java REST APIs are stateless.
 - Backend Orchestrator
 - Telemetry Gateway
 - 3D Dashboard
+
+<!-- Architecture Flowchart -->
