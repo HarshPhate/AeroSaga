@@ -28,4 +28,4 @@ public interface DroneMissionActivity {
     public double destLon;
     public double altitude;
   }
-}
+} // Idempotent activity definitions
