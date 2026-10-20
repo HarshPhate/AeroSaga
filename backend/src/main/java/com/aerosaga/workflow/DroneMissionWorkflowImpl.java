@@ -147,4 +147,4 @@ public class DroneMissionWorkflowImpl implements DroneMissionWorkflow {
     state.aborted = aborted;
     return state;
   }
-}
+} // battery discharge profile
