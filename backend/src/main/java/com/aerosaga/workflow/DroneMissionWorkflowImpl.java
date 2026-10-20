@@ -148,3 +148,4 @@ public class DroneMissionWorkflowImpl implements DroneMissionWorkflow {
     return state;
   }
 } // battery discharge profile
+ // Replay safe determinism
