@@ -98,3 +98,4 @@ public class MissionService {
     stub.signalDroneOffline();
   }
 }
+ // Asynchronous execution path
