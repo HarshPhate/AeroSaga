@@ -43,3 +43,4 @@ public class TelemetryWebSocketController {
     return Map.of("status", "ok", "droneId", telemetry.getOrDefault("droneId", ""));
   }
 }
+ // Payload validation
