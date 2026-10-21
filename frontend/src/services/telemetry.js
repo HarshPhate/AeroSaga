@@ -137,3 +137,4 @@ export class ApiService {
     await fetch(`http://localhost:8081/api/missions/${droneId}/reconnect`, { method: 'POST' });
   }
 }
+ // STOMP reconnect policy
