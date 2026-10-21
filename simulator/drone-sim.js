@@ -193,3 +193,4 @@ process.on('SIGINT', () => {
   console.log('\nSimulator shutting down...');
   process.exit(0);
 });
+ // Storm simulation parameters
