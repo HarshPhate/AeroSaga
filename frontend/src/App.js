@@ -553,3 +553,4 @@ const App = () => {
 };
 
 export default App;
+ // Interpolation smoothing factor
