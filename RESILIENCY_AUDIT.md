@@ -180,3 +180,5 @@ Verify that when `dropPackage` fails, the workflow automatically runs `returnToB
 - `currentStep: "DROP_PACKAGE"`, `stepStatus: "FAILED"`
 - Then: `currentStep: "RETURN_TO_BASE"`, `stepStatus: "ACTIVE"`
 - Finally: `currentStep: "MISSION_COMPLETE"`, `stepStatus: "COMPENSATED"`
+
+<!-- Audit Verification Steps -->
