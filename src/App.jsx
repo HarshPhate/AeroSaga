@@ -99,6 +99,7 @@ function App() {
   const [deliveryLocation, setDeliveryLocation] = useState("");
   const [selectedDrone, setSelectedDrone] = useState("");
   const [selectedMissionId, setSelectedMissionId] = useState("");
+  const [liveTrackingDroneId, setLiveTrackingDroneId] = useState("");
   const [missionMessage, setMissionMessage] = useState("");
   const [search, setSearch] = useState("");
   const [historyFilter, setHistoryFilter] = useState("All");
@@ -145,8 +146,10 @@ function App() {
   const completedMissions = missions.filter((mission) => mission.status === "Completed");
   const inFlight = missions.filter((mission) => mission.status === "In Progress").length;
   const paused = missions.filter((mission) => mission.status === "Paused").length;
-  const selectedMission = missions.find((mission) => mission.id === selectedMissionId) || activeMissions[0] || missions[0] || null;
+  const selectedMission = missions.find((mission) => mission.id === selectedMissionId) || null;
   const getDroneMission = (droneId) => missions.find((mission) => mission.droneId === droneId && mission.status !== "Completed");
+  const liveTrackingMissions = missions.filter((mission) => mission.status !== "Completed");
+  const liveTrackingMission = liveTrackingMissions.find((mission) => mission.droneId === liveTrackingDroneId) || null;
   const filteredMissions = missions.filter((mission) => {
     const text = `${mission.id} ${mission.name} ${mission.pickup} ${mission.destination} ${mission.droneId} ${mission.status}`.toLowerCase();
     return text.includes(search.toLowerCase());
@@ -180,7 +183,6 @@ function App() {
     if (!drone) return setMissionMessage("Choose an available drone with at least 20% battery.");
     const mission = { id: `MISSION-${Date.now()}`, name, pickup, destination, droneId: drone.id, status: "Created", progress: 0, createdAt: new Date().toISOString() };
     setMissions((current) => [mission, ...current]);
-    setSelectedMissionId(mission.id);
     setMissionName(""); setPickupLocation(""); setDeliveryLocation("");
     setMissionMessage("Mission created successfully.");
   };
@@ -247,8 +249,14 @@ function App() {
         <StatCard label="Paused missions" value={paused} hint="Require attention" icon="Ⅱ" accent="amber" />
       </div>
       <section className="panel map-panel">
-        <div className="section-title"><div><p className="eyebrow">LIVE FLEET VIEW</p><h3>Fleet location overview</h3><p className="muted">Sample locations around Vijayawada, Guntur, and Tenali.</p></div><span className="live-pill"><i /> Simulation mode</span></div>
-        <div className="globe-container"><GlobeView height={420} showFleet /></div>
+        <div className="section-title"><div><p className="eyebrow">LIVE DRONE TRACKING</p><h3>Track one drone at a time</h3><p className="muted">Choose a drone with an unfinished mission. No drone is selected automatically.</p></div><span className="live-pill"><i /> Simulation mode</span></div>
+        <label className="tracking-select-label">Select drone to track
+          <select className="compact-select" value={liveTrackingDroneId} onChange={(e) => setLiveTrackingDroneId(e.target.value)}>
+            <option value="">Choose a drone...</option>
+            {liveTrackingMissions.map((mission) => <option key={mission.id} value={mission.droneId}>{mission.droneId} — {mission.name} ({mission.status})</option>)}
+          </select>
+        </label>
+        {liveTrackingMission ? <><div className="tracking-summary"><strong>{liveTrackingMission.name}</strong><span>{liveTrackingMission.pickup} → {liveTrackingMission.destination}</span><StatusBadge status={liveTrackingMission.status} /></div><div className="globe-container"><GlobeView key={liveTrackingMission.id} mission={liveTrackingMission} progress={liveTrackingMission.progress} height={420} /></div><ProgressBar value={liveTrackingMission.progress} label={`${liveTrackingMission.droneId} delivery progress`} /></> : <EmptyState title={liveTrackingMissions.length ? "Select a drone to view its route" : "No active drone missions"} description={liveTrackingMissions.length ? "Use the selector above to display only that drone and its mission route on the map." : "Create a mission and assign a drone to enable live tracking."} />}
       </section>
       <div className="content-grid dashboard-lower">
         <section className="panel"><div className="section-title"><div><p className="eyebrow">CURRENT ACTIVITY</p><h3>Active missions</h3></div><button className="text-button" onClick={() => navigate("missions")}>View all →</button></div>
@@ -277,6 +285,16 @@ function App() {
         <div className="globe-container"><GlobeView mission={selectedMission} progress={selectedMission.progress} height={380} /></div>
         <div className="tracking-footer"><ProgressBar value={selectedMission.progress} label="Mission progress" color={selectedMission.status === "Completed" ? "green" : "blue"} /><div className="mission-actions">{selectedMission.status === "Created" && <button className="button button-primary" onClick={() => updateMissionStatus(selectedMission.id, "In Progress")}>Start mission</button>}{selectedMission.status === "In Progress" && <button className="button button-secondary" onClick={() => updateMissionStatus(selectedMission.id, "Paused")}>Pause mission</button>}{selectedMission.status === "Paused" && <button className="button button-primary" onClick={() => updateMissionStatus(selectedMission.id, "In Progress")}>Resume mission</button>}{selectedMission.status !== "Completed" && <button className="button button-success" onClick={() => updateMissionStatus(selectedMission.id, "Completed")}>Complete mission</button>}</div></div>
       </section>}
+      <section className="panel map-panel queue-tracking-panel">
+        <div className="section-title"><div><p className="eyebrow">LIVE DRONE TRACKING</p><h3>Choose which drone to view</h3><p className="muted">The map stays empty until you manually select a drone. Creating a mission will not open its map automatically.</p></div><span className="live-pill"><i /> Simulation mode</span></div>
+        <label className="tracking-select-label">Select drone for map view
+          <select className="compact-select" value={liveTrackingDroneId} onChange={(e) => setLiveTrackingDroneId(e.target.value)}>
+            <option value="">No drone selected — keep map clear</option>
+            {liveTrackingMissions.map((mission) => <option key={mission.id} value={mission.droneId}>{mission.droneId} — {mission.name} ({mission.status})</option>)}
+          </select>
+        </label>
+        {liveTrackingMission ? <><div className="tracking-summary"><strong>{liveTrackingMission.droneId} · {liveTrackingMission.name}</strong><span>{liveTrackingMission.pickup} → {liveTrackingMission.destination}</span><StatusBadge status={liveTrackingMission.status} /></div><div className="globe-container"><GlobeView key={liveTrackingMission.id} mission={liveTrackingMission} progress={liveTrackingMission.progress} height={420} /></div><ProgressBar value={liveTrackingMission.progress} label={`${liveTrackingMission.droneId} delivery progress`} /></> : <EmptyState title={liveTrackingMissions.length ? "No drone selected" : "No missions to track"} description={liveTrackingMissions.length ? "Choose a drone from the dropdown above to show only its route on the map." : "Create a mission first. The map will remain clear until you select its drone here."} />}
+      </section>
       <section><div className="section-title list-title"><div><p className="eyebrow">DELIVERY QUEUE</p><h3>All missions</h3></div><div className="search-field"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search missions..." /></div></div>
         {filteredMissions.length ? <div className="mission-list">{filteredMissions.map((mission) => renderMissionCard(mission, true))}</div> : <EmptyState title="No matching missions" description="Create a mission or adjust your search." />}
       </section>
@@ -287,7 +305,10 @@ function App() {
     <>
       <section className="page-intro"><div><p className="eyebrow">AIRCRAFT</p><h2>Drone Fleet</h2><p>Review each drone's readiness, battery level, location, and mission assignment.</p></div><span className="subtle-chip">{drones.length} registered drones</span></section>
       <div className="stats-grid three"><StatCard label="Available" value={availableDrones.length} hint="Ready for assignment" icon="✓" accent="green" /><StatCard label="Assigned" value={drones.length - availableDrones.length} hint="Busy or below battery threshold" icon="⌁" accent="blue" /><StatCard label="Low battery" value={drones.filter((drone) => drone.battery < 30).length} hint="Below 30% threshold" icon="!" accent="amber" /></div>
-      <section className="panel map-panel"><div className="section-title"><div><p className="eyebrow">FLEET MAP</p><h3>Drone positions</h3></div><span className="live-pill"><i /> Simulated locations</span></div><div className="globe-container"><GlobeView height={390} showFleet /></div></section>
+      <section className="panel map-panel"><div className="section-title"><div><p className="eyebrow">LIVE DRONE TRACKING</p><h3>Track a specific drone</h3><p className="muted">Select one assigned drone to display only its mission on the map.</p></div><span className="live-pill"><i /> Simulation mode</span></div>
+        <label className="tracking-select-label">Select drone to track<select className="compact-select" value={liveTrackingDroneId} onChange={(e) => setLiveTrackingDroneId(e.target.value)}><option value="">Choose a drone...</option>{liveTrackingMissions.map((mission) => <option key={mission.id} value={mission.droneId}>{mission.droneId} — {mission.name} ({mission.status})</option>)}</select></label>
+        {liveTrackingMission ? <><div className="tracking-summary"><strong>{liveTrackingMission.name}</strong><span>{liveTrackingMission.pickup} → {liveTrackingMission.destination}</span><StatusBadge status={liveTrackingMission.status} /></div><div className="globe-container"><GlobeView key={liveTrackingMission.id} mission={liveTrackingMission} progress={liveTrackingMission.progress} height={390} /></div><ProgressBar value={liveTrackingMission.progress} label={`${liveTrackingMission.droneId} delivery progress`} /></> : <EmptyState title={liveTrackingMissions.length ? "Select a drone to view its route" : "No active drone missions"} description={liveTrackingMissions.length ? "Choose a drone above. The map will show only its mission route." : "Create a mission and assign a drone to enable tracking."} />}
+      </section>
       <div className="drone-grid">{drones.map((drone) => <DroneCard key={drone.id} drone={drone} mission={getDroneMission(drone.id)} onViewMission={openMission} />)}</div>
     </>
   );
