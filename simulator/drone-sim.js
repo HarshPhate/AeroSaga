@@ -194,3 +194,4 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
  // Storm simulation parameters
+ // Clean process shutdown
