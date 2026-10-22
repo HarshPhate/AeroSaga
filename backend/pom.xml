@@ -71,4 +71,4 @@
       </plugin>
     </plugins>
   </build>
-</project>
+</project> <!-- Compiler warning options -->
