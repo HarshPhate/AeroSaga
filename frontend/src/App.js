@@ -557,3 +557,4 @@ export default App;
  // Camera view preset
  // DAG styling updates
  // Battery telemetry display
+ // Entity cleanup
