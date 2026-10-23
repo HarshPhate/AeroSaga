@@ -11,3 +11,5 @@ Problem Statement: Standard Java REST APIs are stateless.
 <!-- Architecture Flowchart -->
 
 <!-- Troubleshooting Guide -->
+
+<!-- Port Allocation Matrix -->
