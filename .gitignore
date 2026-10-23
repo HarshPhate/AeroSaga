@@ -4,3 +4,6 @@ build/
 *.log
 .idea/
 .vscode/
+
+*.tmp
+*.bak
