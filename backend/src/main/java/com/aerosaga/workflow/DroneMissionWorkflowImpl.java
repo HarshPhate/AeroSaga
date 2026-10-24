@@ -151,3 +151,4 @@ public class DroneMissionWorkflowImpl implements DroneMissionWorkflow {
  // Replay safe determinism
  // Saga compensation transaction flow
  // Telemetry timestamp capture
+ // Battery floor guard
