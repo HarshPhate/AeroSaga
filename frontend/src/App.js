@@ -558,3 +558,4 @@ export default App;
  // DAG styling updates
  // Battery telemetry display
  // Entity cleanup
+ // Fallback point icon
