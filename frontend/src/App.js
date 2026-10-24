@@ -559,3 +559,4 @@ export default App;
  // Battery telemetry display
  // Entity cleanup
  // Fallback point icon
+ // Animation timing curve
