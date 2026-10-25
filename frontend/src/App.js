@@ -560,3 +560,4 @@ export default App;
  // Entity cleanup
  // Fallback point icon
  // Animation timing curve
+ // Entity map cache
