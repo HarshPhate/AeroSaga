@@ -152,3 +152,4 @@ public class DroneMissionWorkflowImpl implements DroneMissionWorkflow {
  // Saga compensation transaction flow
  // Telemetry timestamp capture
  // Battery floor guard
+ // Retry options documentation
