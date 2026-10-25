@@ -40,3 +40,4 @@ public class WorkerConfig {
     return args -> workerFactory.start();
   }
 } // worker thread config
+ // Worker lifecycle runner
