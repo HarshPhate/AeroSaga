@@ -17,3 +17,5 @@ Problem Statement: Standard Java REST APIs are stateless.
 <!-- Temporal Features Table -->
 
 <!-- Final Architecture Check -->
+
+<!-- Deployment Notes -->
