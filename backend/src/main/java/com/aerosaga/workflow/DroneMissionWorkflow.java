@@ -52,4 +52,4 @@ public interface DroneMissionWorkflow {
     public boolean offline;
     public boolean aborted;
   }
-} // Workflow interface specifications
+}

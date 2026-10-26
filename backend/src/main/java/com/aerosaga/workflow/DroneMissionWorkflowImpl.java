@@ -147,9 +147,4 @@ public class DroneMissionWorkflowImpl implements DroneMissionWorkflow {
     state.aborted = aborted;
     return state;
   }
-} // battery discharge profile
- // Replay safe determinism
- // Saga compensation transaction flow
- // Telemetry timestamp capture
- // Battery floor guard
- // Retry options documentation
+}

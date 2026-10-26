@@ -553,11 +553,3 @@ const App = () => {
 };
 
 export default App;
- // Interpolation smoothing factor
- // Camera view preset
- // DAG styling updates
- // Battery telemetry display
- // Entity cleanup
- // Fallback point icon
- // Animation timing curve
- // Entity map cache

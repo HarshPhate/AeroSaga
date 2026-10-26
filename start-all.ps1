@@ -41,4 +41,3 @@ Write-Host " - 3D Dashboard:   http://localhost:3000     " -ForegroundColor Whit
 Write-Host " - Gateway API:    http://localhost:8081     " -ForegroundColor White
 Write-Host " - Temporal UI:    http://localhost:8088     " -ForegroundColor White
 Write-Host "=============================================" -ForegroundColor Green
- # Status output formatting

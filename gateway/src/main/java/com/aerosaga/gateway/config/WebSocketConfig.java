@@ -22,5 +22,3 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     registry.enableSimpleBroker("/topic", "/queue", "/user");
   }
 }
- // STOMP destination configuration
- // Destination prefix rules

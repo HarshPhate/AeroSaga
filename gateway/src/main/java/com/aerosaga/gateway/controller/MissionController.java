@@ -89,5 +89,3 @@ public class MissionController {
     return ResponseEntity.ok().build();
   }
 }
- // Signal dispatch error handling
- // Cross-origin resource sharing

@@ -58,4 +58,3 @@ Write-Host ("Aborted Flag:            " + $abortedState.aborted) -ForegroundColo
 Write-Host "`n==========================================================" -ForegroundColor Green
 Write-Host " Resiliency Audit Complete! Temporal Durability Verified. " -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Green
- # Pre-flight connection check

@@ -1,9 +1,41 @@
+# Maven target directories
 target/
-node_modules/
-build/
-*.log
-.idea/
-.vscode/
+**/target/
+*.class
 
-*.tmp
-*.bak
+# Node / npm
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# React build
+frontend/build/
+build/
+
+# Logs
+*.log
+init.log
+temporal.log
+ui.log
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Environment variables & local secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
