@@ -44,3 +44,4 @@ public class TelemetryWebSocketController {
   }
 }
  // Payload validation
+ // Broadcasting architecture
