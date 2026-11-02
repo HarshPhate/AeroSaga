@@ -8,6 +8,42 @@ const initialDrones = [
   { id: "DRONE-03", status: "Ready", battery: 46, location: "Tenali" },
 ];
 
+// Approximate city-centre coordinates for the demo's supported locations.
+// Unknown locations deliberately show "Not available" instead of invented coordinates.
+const knownCoordinates = {
+  vijayawada: { latitude: 16.5062, longitude: 80.6480 },
+  guntur: { latitude: 16.3067, longitude: 80.4365 },
+  tenali: { latitude: 16.2395, longitude: 80.6400 },
+};
+
+function coordinatesFor(location) {
+  return knownCoordinates[String(location || "").trim().toLowerCase()] || null;
+}
+
+function formatDate(value) {
+  if (!value) return "Not recorded";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Not recorded" : date.toLocaleString();
+}
+
+function formatDuration(milliseconds) {
+  if (!Number.isFinite(milliseconds) || milliseconds < 0) return "Not available";
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours) return `${hours}h ${minutes}m ${seconds}s`;
+  if (minutes) return `${minutes}m ${seconds}s`;
+  return `${seconds}s`;
+}
+
+function CoordinateValue({ location }) {
+  const coords = coordinatesFor(location);
+  return coords
+    ? <>{coords.latitude.toFixed(4)}, {coords.longitude.toFixed(4)}</>
+    : <>Not available for this location</>;
+}
+
 const navItems = [
   { id: "dashboard", label: "Dashboard", icon: "▦" },
   { id: "missions", label: "Mission Control", icon: "⌁" },
@@ -136,7 +172,8 @@ function App() {
       setMissions((current) => current.map((mission) => {
         if (mission.status !== "In Progress") return mission;
         const progress = Math.min(mission.progress + 1, 100);
-        return { ...mission, progress, status: progress >= 100 ? "Completed" : "In Progress" };
+        const completed = progress >= 100;
+        return { ...mission, progress, status: completed ? "Completed" : "In Progress", completedAt: completed ? (mission.completedAt || new Date().toISOString()) : mission.completedAt };
       }));
     }, 300);
     return () => clearInterval(timer);
@@ -181,16 +218,23 @@ function App() {
     if (pickup.toLowerCase() === destination.toLowerCase()) return setMissionMessage("Pickup and destination must be different.");
     const drone = availableDrones.find((item) => item.id === selectedDrone);
     if (!drone) return setMissionMessage("Choose an available drone with at least 20% battery.");
-    const mission = { id: `MISSION-${Date.now()}`, name, pickup, destination, droneId: drone.id, status: "Created", progress: 0, createdAt: new Date().toISOString() };
+    const mission = { id: `MISSION-${Date.now()}`, name, pickup, destination, droneId: drone.id, status: "Created", progress: 0, createdAt: new Date().toISOString(), startedAt: null, completedAt: null };
     setMissions((current) => [mission, ...current]);
     setMissionName(""); setPickupLocation(""); setDeliveryLocation("");
     setMissionMessage("Mission created successfully.");
   };
 
   const updateMissionStatus = (missionId, status) => {
-    setMissions((current) => current.map((mission) => mission.id !== missionId ? mission : {
-      ...mission, status, progress: status === "Completed" ? 100 : mission.progress,
-      completedAt: status === "Completed" ? new Date().toISOString() : mission.completedAt,
+    setMissions((current) => current.map((mission) => {
+      if (mission.id !== missionId) return mission;
+      const now = new Date().toISOString();
+      return {
+        ...mission,
+        status,
+        progress: status === "Completed" ? 100 : mission.progress,
+        startedAt: status === "In Progress" ? (mission.startedAt || now) : mission.startedAt,
+        completedAt: status === "Completed" ? (mission.completedAt || now) : mission.completedAt,
+      };
     }));
     setSelectedMissionId(missionId);
     setMissionMessage(`Mission updated: ${status}.`);
@@ -209,9 +253,8 @@ function App() {
     setMissionMessage("Mission deleted.");
   };
 
-  const openMission = (id) => { setSelectedMissionId(id); setPage("missions"); setSidebarOpen(false); };
+  const openMission = (id) => { setSelectedMissionId(id); setPage("mission-details"); setSidebarOpen(false); window.scrollTo({ top: 0, behavior: "auto" }); };
   const navigate = (id) => { setPage(id); setSidebarOpen(false); setSearch(""); };
-  const formatDate = (value) => value ? new Date(value).toLocaleString() : "Date unavailable";
 
   const renderMissionCard = (mission, controls = false) => (
     <article className="panel mission-card" key={mission.id}>
@@ -281,10 +324,6 @@ function App() {
           <div className="form-submit"><button className="button button-primary" disabled={!availableDrones.length}>Create mission</button>{!availableDrones.length && <span className="muted small">No free drones with at least 20% battery.</span>}{missionMessage && <span className="form-message" role="status">{missionMessage}</span>}</div>
         </form>
       </section>
-      {selectedMission && <section className="panel"><div className="section-title"><div><p className="eyebrow">MISSION TRACKING</p><h3>{selectedMission.name}</h3><p className="muted">{selectedMission.pickup} → {selectedMission.destination} · {selectedMission.droneId}</p></div><StatusBadge status={selectedMission.status} /></div>
-        <div className="globe-container"><GlobeView mission={selectedMission} progress={selectedMission.progress} height={380} /></div>
-        <div className="tracking-footer"><ProgressBar value={selectedMission.progress} label="Mission progress" color={selectedMission.status === "Completed" ? "green" : "blue"} /><div className="mission-actions">{selectedMission.status === "Created" && <button className="button button-primary" onClick={() => updateMissionStatus(selectedMission.id, "In Progress")}>Start mission</button>}{selectedMission.status === "In Progress" && <button className="button button-secondary" onClick={() => updateMissionStatus(selectedMission.id, "Paused")}>Pause mission</button>}{selectedMission.status === "Paused" && <button className="button button-primary" onClick={() => updateMissionStatus(selectedMission.id, "In Progress")}>Resume mission</button>}{selectedMission.status !== "Completed" && <button className="button button-success" onClick={() => updateMissionStatus(selectedMission.id, "Completed")}>Complete mission</button>}</div></div>
-      </section>}
       <section className="panel map-panel queue-tracking-panel">
         <div className="section-title"><div><p className="eyebrow">LIVE DRONE TRACKING</p><h3>Choose which drone to view</h3><p className="muted">The map stays empty until you manually select a drone. Creating a mission will not open its map automatically.</p></div><span className="live-pill"><i /> Simulation mode</span></div>
         <label className="tracking-select-label">Select drone for map view
@@ -300,6 +339,32 @@ function App() {
       </section>
     </>
   );
+
+  const renderMissionDetails = () => {
+    if (!selectedMission) {
+      return <section className="panel"><EmptyState title="Mission not found" description="This mission may have been deleted. Return to Mission Control to choose another mission." /><button className="button button-primary" onClick={() => navigate("missions")}>Back to Mission Control</button></section>;
+    }
+    return (
+      <>
+        <section className="page-intro mission-details-intro">
+          <div><p className="eyebrow">MISSION DETAILS</p><h2>{selectedMission.name}</h2><p>{selectedMission.id} · {selectedMission.pickup} → {selectedMission.destination}</p></div>
+          <div className="mission-details-heading-actions"><StatusBadge status={selectedMission.status} /><button className="button button-ghost" onClick={() => navigate("missions")}>← Back to missions</button></div>
+        </section>
+        <section className="panel mission-detail-panel">
+<div className="section-title"><div><p className="eyebrow">MISSION & DRONE DETAILS</p><h3>{selectedMission.name}</h3><p className="muted">{selectedMission.id} · {selectedMission.pickup} → {selectedMission.destination}</p></div><div className="detail-title-right"><StatusBadge status={selectedMission.status} /><button className="button button-ghost button-small" onClick={() => navigate("missions")}>Back to missions</button></div></div>
+        <div className="detail-section-grid">
+          <section className="detail-section"><p className="eyebrow">DRONE INFORMATION</p><div className="detail-pair"><span>Drone ID</span><strong>{selectedMission.droneId}</strong></div><div className="detail-pair"><span>Drone condition</span><strong>{(drones.find((drone) => drone.id === selectedMission.droneId)?.battery ?? null) === null ? "Not available" : `${drones.find((drone) => drone.id === selectedMission.droneId).battery}% battery`}</strong></div><div className="detail-pair"><span>Current state</span><strong>{selectedMission.status === "In Progress" ? "In flight (simulated)" : selectedMission.status === "Paused" ? "Paused" : selectedMission.status === "Completed" ? "Mission completed" : "Assigned / awaiting start"}</strong></div></section>
+          <section className="detail-section"><p className="eyebrow">ROUTE COORDINATES</p><div className="detail-pair"><span>Pickup · {selectedMission.pickup}</span><strong><CoordinateValue location={selectedMission.pickup} /></strong></div><div className="detail-pair"><span>Destination · {selectedMission.destination}</span><strong><CoordinateValue location={selectedMission.destination} /></strong></div><p className="footnote">Coordinates are approximate city-centre values for Vijayawada, Guntur, and Tenali. Other locations are not geocoded.</p></section>
+          <section className="detail-section"><p className="eyebrow">MISSION TIMELINE</p><div className="detail-pair"><span>Created at</span><strong>{formatDate(selectedMission.createdAt)}</strong></div><div className="detail-pair"><span>Started at</span><strong>{formatDate(selectedMission.startedAt)}</strong></div><div className="detail-pair"><span>Completed at</span><strong>{formatDate(selectedMission.completedAt)}</strong></div><div className="detail-pair"><span>Elapsed duration</span><strong>{selectedMission.startedAt ? formatDuration(new Date(selectedMission.completedAt || Date.now()).getTime() - new Date(selectedMission.startedAt).getTime()) : "Not started"}</strong></div><div className="detail-pair"><span>Estimated arrival</span><strong>Not calculated</strong></div></section>
+          <section className="detail-section"><p className="eyebrow">DELIVERY STATUS</p><div className="detail-pair"><span>Progress</span><strong>{selectedMission.progress}%</strong></div><div className="detail-pair"><span>Route distance</span><strong>Not calculated</strong></div><div className="detail-pair"><span>Telemetry source</span><strong>Frontend simulation</strong></div><ProgressBar value={selectedMission.progress} label="Delivery progress" color={selectedMission.status === "Completed" ? "green" : "blue"} /></section>
+        </div>
+        <div className="section-title detail-map-title"><div><p className="eyebrow">MISSION MAP</p><h3>{selectedMission.droneId} route</h3></div></div>
+        <div className="globe-container"><GlobeView mission={selectedMission} progress={selectedMission.progress} height={380} /></div>
+        <div className="tracking-footer"><ProgressBar value={selectedMission.progress} label="Mission progress" color={selectedMission.status === "Completed" ? "green" : "blue"} /><div className="mission-actions">{selectedMission.status === "Created" && <button className="button button-primary" onClick={() => updateMissionStatus(selectedMission.id, "In Progress")}>Start mission</button>}{selectedMission.status === "In Progress" && <button className="button button-secondary" onClick={() => updateMissionStatus(selectedMission.id, "Paused")}>Pause mission</button>}{selectedMission.status === "Paused" && <button className="button button-primary" onClick={() => updateMissionStatus(selectedMission.id, "In Progress")}>Resume mission</button>}{selectedMission.status !== "Completed" && <button className="button button-success" onClick={() => updateMissionStatus(selectedMission.id, "Completed")}>Complete mission</button>}</div></div>
+        </section>
+      </>
+    );
+  };
 
   const renderFleet = () => (
     <>
@@ -361,9 +426,10 @@ function App() {
     </>
   );
 
-  const pageTitles = { dashboard: "Dashboard", missions: "Mission Control", fleet: "Drone Fleet", history: "Mission History", analytics: "Analytics", notifications: "Notifications", profile: "Profile", settings: "Settings" };
+  const pageTitles = { "mission-details": "Mission Details", dashboard: "Dashboard", missions: "Mission Control", fleet: "Drone Fleet", history: "Mission History", analytics: "Analytics", notifications: "Notifications", profile: "Profile", settings: "Settings" };
   const renderPage = () => {
     switch (page) {
+      case "mission-details": return renderMissionDetails();
       case "missions": return renderMissions();
       case "fleet": return renderFleet();
       case "history": return renderHistory();

@@ -192,3 +192,60 @@ td small { color: #94a3b8; font-size: 9px; }
 .tracking-select-label select { width: 100%; min-height: 42px; }
 .tracking-summary { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 12px 0; padding: 12px 14px; border: 1px solid var(--border, rgba(128,128,128,.25)); border-radius: 12px; }
 .tracking-summary span { flex: 1; min-width: 180px; color: var(--text-secondary, #8b93a5); font-size: .9rem; }
+
+/* Expanded mission detail panel */
+.mission-detail-panel { margin-bottom: 22px; }
+.detail-title-right { display: flex; align-items: center; gap: 10px; }
+.detail-section-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 8px 0 22px; }
+.detail-section { min-width: 0; padding: 16px; border: 1px solid #e8edf5; border-radius: 11px; background: #fbfcfe; }
+.detail-section .eyebrow { margin-bottom: 10px; }
+.detail-pair { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid #edf1f6; }
+.detail-pair:last-of-type { border-bottom: 0; }
+.detail-pair > span { color: #64748b; font-size: 11px; }
+.detail-pair > strong { color: #1e293b; font-size: 11px; text-align: right; overflow-wrap: anywhere; }
+.detail-section .footnote { margin-top: 10px; }
+.detail-map-title { margin: 8px 0 14px; }
+@media (max-width: 760px) { .detail-section-grid { grid-template-columns: minmax(0, 1fr); } .detail-title-right { align-items: flex-end; flex-direction: column; } }
+
+
+/* Separate, responsive mission details page */
+.details-page-intro { align-items: center; }
+.details-page-intro > button { flex-shrink: 0; }
+.mission-detail-panel { width: 100%; min-width: 0; }
+.detail-section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.detail-section { min-width: 0; overflow-wrap: anywhere; }
+.detail-pair { gap: 16px; }
+.detail-pair > strong { text-align: right; overflow-wrap: anywhere; }
+.globe-container { width: 100%; min-width: 0; overflow: hidden; }
+.details-empty-state { padding: clamp(24px, 5vw, 48px); }
+@media (max-width: 760px) {
+  .details-page-intro { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .detail-section-grid { grid-template-columns: minmax(0, 1fr); }
+  .mission-detail-panel { padding: 16px; }
+  .mission-detail-panel .section-title { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .detail-title-right { width: 100%; flex-wrap: wrap; }
+  .detail-pair { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .detail-pair > strong { text-align: left; }
+  .globe-container { min-height: 280px; }
+}
+
+/* Dedicated mission-details page */
+.mission-details-intro { align-items: flex-start; }
+.mission-details-intro > div:first-child { min-width: 0; }
+.mission-details-heading-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
+.mission-details-intro h2 { overflow-wrap: anywhere; }
+.mission-detail-panel { margin-bottom: 22px; }
+.mission-detail-panel .detail-map-title { margin-top: 8px; }
+.mission-detail-panel .tracking-footer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 20px; }
+.mission-detail-panel .tracking-footer .progress-wrap { min-width: 0; }
+@media (max-width: 760px) {
+  .mission-details-intro { flex-direction: column; align-items: stretch; gap: 16px; }
+  .mission-details-heading-actions { justify-content: flex-start; }
+  .mission-detail-panel .tracking-footer { grid-template-columns: minmax(0, 1fr); }
+  .mission-detail-panel .mission-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+}
+@media (max-width: 480px) {
+  .mission-details-heading-actions .button { flex: 1 1 auto; }
+  .mission-detail-panel .detail-section { padding: 13px; }
+  .mission-detail-panel .detail-pair { gap: 10px; }
+}
