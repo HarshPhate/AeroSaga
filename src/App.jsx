@@ -422,7 +422,7 @@ function App() {
         {[{ key: "missionAlerts", title: "Mission status alerts", desc: "Show mission start, pause, and progress notifications." }, { key: "batteryAlerts", title: "Battery warnings", desc: "Show alerts for drones below the battery threshold." }, { key: "completionAlerts", title: "Completion notifications", desc: "Show a notification when a delivery completes." }, { key: "compactMode", title: "Compact dashboard", desc: "Use tighter spacing for a denser workspace." }].map((item) => <label className="setting-row" key={item.key}><span><strong>{item.title}</strong><small>{item.desc}</small></span><input type="checkbox" checked={Boolean(settings[item.key])} onChange={(e) => { setSettings({ ...settings, [item.key]: e.target.checked }); setSettingsMessage("Preference updated."); }} /></label>)}
         <div className="form-submit"><button className="button button-ghost" onClick={() => { setSettings(defaultSettings); setSettingsMessage("Settings reset to defaults."); }}>Reset defaults</button>{settingsMessage && <span className="form-message" role="status">{settingsMessage}</span>}</div>
       </section>
-      <section className="panel"><div className="section-title"><div><p className="eyebrow">ABOUT</p><h3>AeroSaga Operations</h3></div><span className="subtle-chip">Frontend demo</span></div><p className="muted">React · Vite · CesiumJS / Resium</p><p className="footnote">Mission progress, fleet values, and analytics are simulated. Backend integration and real telemetry can be connected in a later phase.</p></section>
+
     </>
   );
 
