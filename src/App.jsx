@@ -454,7 +454,7 @@ function App() {
       </aside>
       <div className="main-column">
         <header className="app-header"><div className="header-left"><button className="mobile-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation">☰</button><div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{pageTitles[page]}</strong></div></div><div className="header-actions"><label className="global-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setPage("missions"); setSidebarOpen(false); } }} placeholder="Search missions..." aria-label="Search missions" /><kbd>Enter</kbd></label><button className="header-icon-button" title="Notifications" onClick={() => navigate("notifications")}>♧{notifications.length > 0 && <i />}</button><button className="header-profile" onClick={() => navigate("profile")}><span className="user-avatar">{(profile.name || "A").trim().charAt(0).toUpperCase()}</span><span className="header-user-name">{profile.name}</span><span>⌄</span></button></div></header>
-        <main className="page-content">{renderPage()}<footer className="app-footer"><span>© {new Date().getFullYear()} AeroSaga</span><span>Drone delivery operations · Simulation mode</span></footer></main>
+        <main className="page-content">{renderPage()}</main>
       </div>
     </div>
   );
