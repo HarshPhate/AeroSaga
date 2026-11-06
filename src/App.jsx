@@ -143,6 +143,7 @@ function App() {
   const [settings, setSettings] = useState(() => readSaved("aerosaga-settings-v1", defaultSettings));
   const [profileMessage, setProfileMessage] = useState("");
   const [settingsMessage, setSettingsMessage] = useState("");
+  const operatorName = String(profile?.name || "").trim() || "AeroSaga Operator";
 
   useEffect(() => {
     localStorage.setItem("aerosaga-missions-v1", JSON.stringify(missions));
@@ -282,7 +283,7 @@ function App() {
   const renderDashboard = () => (
     <>
       <section className="welcome-row">
-        <div><p className="eyebrow">FLEET OPERATIONS / OVERVIEW</p><h2>Good to see you, {profile.name.split(" ")[0]}.</h2><p>Monitor your fleet, coordinate deliveries, and review mission activity from one place.</p></div>
+        <div><p className="eyebrow">FLEET OPERATIONS / OVERVIEW</p><h2>Good to see you, {operatorName.split(" ")[0]}.</h2><p>Monitor your fleet, coordinate deliveries, and review mission activity from one place.</p></div>
         <button className="button button-primary" onClick={() => navigate("missions")}>＋ Create mission</button>
       </section>
       <div className="stats-grid">
@@ -411,7 +412,7 @@ function App() {
   const renderProfile = () => (
     <>
       <section className="page-intro"><div><p className="eyebrow">YOUR ACCOUNT</p><h2>Profile</h2><p>Manage the operator details shown in your workspace.</p></div></section>
-      <section className="panel profile-panel"><div className="profile-hero"><div className="profile-avatar">{(profile.name || "A").trim().charAt(0).toUpperCase()}</div><div><h3>{profile.name}</h3><p>{profile.role}</p></div></div><form className="mission-form" onSubmit={(e) => { e.preventDefault(); setProfileMessage("Profile saved in this browser."); }}><label>Display name<input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} required /></label><label>Email address<input type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} required /></label><label>Role<input value={profile.role} onChange={(e) => setProfile({ ...profile, role: e.target.value })} required /></label><div className="form-submit"><button className="button button-primary">Save profile</button>{profileMessage && <span className="form-message" role="status">{profileMessage}</span>}</div></form><p className="footnote">Profile details are stored locally in this browser; no account service is connected.</p></section>
+      <section className="panel profile-panel"><div className="profile-hero"><div className="profile-avatar">{operatorName.charAt(0).toUpperCase()}</div><div><h3>{operatorName}</h3><p>{profile.role}</p></div></div><form className="mission-form" onSubmit={(e) => { e.preventDefault(); setProfileMessage("Profile saved in this browser."); }}><label>Display name<input value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} required /></label><label>Email address<input type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} required /></label><label>Role<input value={profile.role} onChange={(e) => setProfile({ ...profile, role: e.target.value })} required /></label><div className="form-submit"><button className="button button-primary">Save profile</button>{profileMessage && <span className="form-message" role="status">{profileMessage}</span>}</div></form><p className="footnote">Profile details are stored locally in this browser; no account service is connected.</p></section>
     </>
   );
 
@@ -450,10 +451,10 @@ function App() {
         <nav className="main-nav" aria-label="Main navigation">{navItems.map((item) => <button key={item.id} className={`nav-link ${page === item.id ? "active" : ""}`} onClick={() => navigate(item.id)}><span className="nav-icon">{item.icon}</span><span>{item.label}</span>{item.id === "notifications" && notifications.length > 0 && <span className="nav-count">{notifications.length}</span>}</button>)}</nav>
         <p className="nav-caption nav-caption-bottom">PERSONAL</p>
         <nav className="main-nav" aria-label="Personal navigation"><button className={`nav-link ${page === "profile" ? "active" : ""}`} onClick={() => navigate("profile")}><span className="nav-icon">◉</span><span>Profile</span></button><button className={`nav-link ${page === "settings" ? "active" : ""}`} onClick={() => navigate("settings")}><span className="nav-icon">⚙</span><span>Settings</span></button></nav>
-        <div className="sidebar-bottom"><div className="sidebar-status"><span className="status-dot" /><div><strong>System operational</strong><small>Simulation environment</small></div></div><div className="sidebar-user"><div className="user-avatar">{(profile.name || "A").trim().charAt(0).toUpperCase()}</div><div className="grow"><strong>{profile.name}</strong><small>{profile.role}</small></div><button className="user-menu-button" title="Open profile" onClick={() => navigate("profile")}>•••</button></div></div>
+        <div className="sidebar-bottom"><div className="sidebar-status"><span className="status-dot" /><div><strong>System operational</strong><small>Simulation environment</small></div></div><div className="sidebar-user"><div className="user-avatar">{operatorName.charAt(0).toUpperCase()}</div><div className="grow"><strong>{operatorName}</strong><small>{profile.role}</small></div><button className="user-menu-button" title="Open profile" onClick={() => navigate("profile")}>•••</button></div></div>
       </aside>
       <div className="main-column">
-        <header className="app-header"><div className="header-left"><button className="mobile-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation">☰</button><div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{pageTitles[page]}</strong></div></div><div className="header-actions"><label className="global-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setPage("missions"); setSidebarOpen(false); } }} placeholder="Search missions..." aria-label="Search missions" /><kbd>Enter</kbd></label><button className="header-icon-button" title="Notifications" onClick={() => navigate("notifications")}>♧{notifications.length > 0 && <i />}</button><button className="header-profile" onClick={() => navigate("profile")}><span className="user-avatar">{(profile.name || "A").trim().charAt(0).toUpperCase()}</span><span className="header-user-name">{profile.name}</span><span>⌄</span></button></div></header>
+        <header className="app-header"><div className="header-left"><button className="mobile-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation">☰</button><div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{pageTitles[page]}</strong></div></div><div className="header-actions"><label className="global-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setPage("missions"); setSidebarOpen(false); } }} placeholder="Search missions..." aria-label="Search missions" /><kbd>Enter</kbd></label><button className="header-icon-button" title="Notifications" onClick={() => navigate("notifications")}>♧{notifications.length > 0 && <i />}</button><button className="header-profile" onClick={() => navigate("profile")}><span className="user-avatar">{operatorName.charAt(0).toUpperCase()}</span><span className="header-user-name">{operatorName}</span><span>⌄</span></button></div></header>
         <main className="page-content">{renderPage()}</main>
       </div>
     </div>
