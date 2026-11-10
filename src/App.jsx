@@ -127,6 +127,7 @@ function EmptyState({ title, description }) {
 
 function App() {
   const [page, setPage] = useState("dashboard");
+  const [theme, setTheme] = useState(() => readSaved("aerosaga-theme-v1", "light"));
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [drones] = useState(initialDrones);
   const [missions, setMissions] = useState(() => readSaved("aerosaga-missions-v1", []));
@@ -144,6 +145,10 @@ function App() {
   const [profileMessage, setProfileMessage] = useState("");
   const [settingsMessage, setSettingsMessage] = useState("");
   const operatorName = String(profile?.name || "").trim() || "AeroSaga Operator";
+
+  useEffect(() => {
+    localStorage.setItem("aerosaga-theme-v1", JSON.stringify(theme));
+  }, [theme]);
 
   useEffect(() => {
     localStorage.setItem("aerosaga-missions-v1", JSON.stringify(missions));
@@ -443,7 +448,7 @@ function App() {
   };
 
   return (
-    <div className={`aerosaga-shell ${settings.compactMode ? "compact-mode" : ""}`}>
+    <div className={`aerosaga-shell ${settings.compactMode ? "compact-mode" : ""} ${theme === "dark" ? "theme-dark" : "theme-light"}`} data-theme={theme}>
       {sidebarOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setSidebarOpen(false)} />}
       <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
         <div className="brand"><div className="brand-mark">A</div><div><strong>AeroSaga</strong><span>DRONE OPERATIONS</span></div><button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Close menu">×</button></div>
@@ -454,7 +459,17 @@ function App() {
         <div className="sidebar-bottom"><div className="sidebar-status"><span className="status-dot" /><div><strong>System operational</strong><small>Simulation environment</small></div></div><div className="sidebar-user"><div className="user-avatar">{operatorName.charAt(0).toUpperCase()}</div><div className="grow"><strong>{operatorName}</strong></div><button className="user-menu-button" title="Open profile" onClick={() => navigate("profile")}>•••</button></div></div>
       </aside>
       <div className="main-column">
-        <header className="app-header"><div className="header-left"><button className="mobile-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation">☰</button><div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{pageTitles[page]}</strong></div></div><div className="header-actions"><label className="global-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setPage("missions"); setSidebarOpen(false); } }} placeholder="Search missions..." aria-label="Search missions" /><kbd>Enter</kbd></label><button className="header-icon-button" type="button" title="Notifications" aria-label={`Notifications${notifications.length > 0 ? `, ${notifications.length} unread` : ""}`} onClick={() => navigate("notifications")}><svg className="header-notification-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>{notifications.length > 0 && <i />}</button><button className="header-profile" type="button" aria-label="Open profile" onClick={() => navigate("profile")}><span className="user-avatar">{operatorName.charAt(0).toUpperCase()}</span><span className="header-user-name">{operatorName}</span></button></div></header>
+        <header className="app-header"><div className="header-left"><button className="mobile-menu" onClick={() => setSidebarOpen(true)} aria-label="Open navigation">☰</button><div className="breadcrumbs"><span>Workspace</span><b>/</b><strong>{pageTitles[page]}</strong></div></div><div className="header-actions"><label className="global-search"><span>⌕</span><input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setPage("missions"); setSidebarOpen(false); } }} placeholder="Search missions..." aria-label="Search missions" /><kbd>Enter</kbd></label><button className="header-icon-button" type="button" title="Notifications" aria-label={`Notifications${notifications.length > 0 ? `, ${notifications.length} unread` : ""}`} onClick={() => navigate("notifications")}><svg className="header-notification-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>{notifications.length > 0 && <i />}</button><button className="header-icon-button theme-toggle-button" type="button"
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-pressed={theme === "dark"}
+            onClick={() => setTheme((current) => current === "dark" ? "light" : "dark")}>
+            {theme === "dark" ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z" /></svg>
+            )}
+          </button><button className="header-profile" type="button" aria-label="Open profile" onClick={() => navigate("profile")}><span className="user-avatar">{operatorName.charAt(0).toUpperCase()}</span><span className="header-user-name">{operatorName}</span></button></div></header>
         <main className="page-content">{renderPage()}</main>
       </div>
     </div>
