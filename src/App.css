@@ -508,3 +508,300 @@ td small { color: #94a3b8; font-size: 9px; }
   .header-actions { gap: 5px; }
   .global-search { width: 34px; min-width: 34px; }
 }
+
+
+/* ===== AeroSaga application-wide theme support ===== */
+.aerosaga-shell {
+  --as-page: #f7f9fc; --as-surface: #fff; --as-surface-soft: #f8fafc;
+  --as-text: #172033; --as-text-strong: #172033; --as-muted: #64748b;
+  --as-subtle: #94a3b8; --as-border: #e2e8f0; --as-border-soft: #edf0f5;
+  --as-input: #fff; --as-hover: #f1f5f9;
+  background: var(--as-page); color: var(--as-text);
+  transition: background-color .2s ease, color .2s ease;
+}
+.aerosaga-shell.theme-dark {
+  color-scheme: dark;
+  --as-page: #0b1220; --as-surface: #111c2e; --as-surface-soft: #172438;
+  --as-text: #dbe5f3; --as-text-strong: #f1f5f9; --as-muted: #a8b6ca;
+  --as-subtle: #8798b0; --as-border: #2a3a52; --as-border-soft: #24344a;
+  --as-input: #0f1a2b; --as-hover: #1b2a40;
+}
+.aerosaga-shell.theme-dark .sidebar,
+.aerosaga-shell.theme-dark .app-header,
+.aerosaga-shell.theme-dark .panel,
+.aerosaga-shell.theme-dark .stat-card,
+.aerosaga-shell.theme-dark .detail-section,
+.aerosaga-shell.theme-dark .mission-card,
+.aerosaga-shell.theme-dark .queue-card,
+.aerosaga-shell.theme-dark .history-card,
+.aerosaga-shell.theme-dark .notification-card,
+.aerosaga-shell.theme-dark .analytics-card,
+.aerosaga-shell.theme-dark .profile-card,
+.aerosaga-shell.theme-dark .settings-card,
+.aerosaga-shell.theme-dark .form-card,
+.aerosaga-shell.theme-dark .table-wrap {
+  background: var(--as-surface); color: var(--as-text); border-color: var(--as-border);
+}
+.aerosaga-shell.theme-dark .page-content,
+.aerosaga-shell.theme-dark .main-column { background: var(--as-page); color: var(--as-text); }
+.aerosaga-shell.theme-dark .brand strong,
+.aerosaga-shell.theme-dark h1, .aerosaga-shell.theme-dark h2,
+.aerosaga-shell.theme-dark h3, .aerosaga-shell.theme-dark h4,
+.aerosaga-shell.theme-dark strong,
+.aerosaga-shell.theme-dark .breadcrumbs strong,
+.aerosaga-shell.theme-dark .header-user-name,
+.aerosaga-shell.theme-dark .sidebar-user strong,
+.aerosaga-shell.theme-dark .stat-card strong { color: var(--as-text-strong); }
+.aerosaga-shell.theme-dark p,
+.aerosaga-shell.theme-dark label,
+.aerosaga-shell.theme-dark .muted,
+.aerosaga-shell.theme-dark .detail-pair span,
+.aerosaga-shell.theme-dark .detail-row span,
+.aerosaga-shell.theme-dark .battery-row span,
+.aerosaga-shell.theme-dark .breadcrumbs,
+.aerosaga-shell.theme-dark .nav-link,
+.aerosaga-shell.theme-dark .global-search,
+.aerosaga-shell.theme-dark .global-search input { color: var(--as-muted); }
+.aerosaga-shell.theme-dark .nav-link.active { background: #172f55; border-color: #28569a; color: #93c5fd; }
+.aerosaga-shell.theme-dark .nav-caption,
+.aerosaga-shell.theme-dark .eyebrow,
+.aerosaga-shell.theme-dark .footnote,
+.aerosaga-shell.theme-dark .stat-hint { color: var(--as-subtle); }
+.aerosaga-shell.theme-dark .global-search,
+.aerosaga-shell.theme-dark input,
+.aerosaga-shell.theme-dark textarea,
+.aerosaga-shell.theme-dark select,
+.aerosaga-shell.theme-dark .global-search kbd {
+  background: var(--as-input); color: var(--as-text); border-color: var(--as-border);
+}
+.aerosaga-shell.theme-dark input::placeholder,
+.aerosaga-shell.theme-dark textarea::placeholder { color: #8192aa; }
+.aerosaga-shell.theme-dark .header-icon-button,
+.aerosaga-shell.theme-dark .header-profile,
+.aerosaga-shell.theme-dark .user-menu-button,
+.aerosaga-shell.theme-dark .sidebar-close {
+  background: var(--as-surface); color: var(--as-muted); border-color: var(--as-border);
+}
+.aerosaga-shell.theme-dark .header-icon-button:hover { background: var(--as-hover); border-color: #4775b8; color: #bfdbfe; }
+.aerosaga-shell.theme-dark .detail-pair,
+.aerosaga-shell.theme-dark .detail-row,
+.aerosaga-shell.theme-dark .sidebar-user,
+.aerosaga-shell.theme-dark .detail-section,
+.aerosaga-shell.theme-dark table th,
+.aerosaga-shell.theme-dark table td { border-color: var(--as-border-soft); }
+.aerosaga-shell.theme-dark table,
+.aerosaga-shell.theme-dark th,
+.aerosaga-shell.theme-dark td { color: var(--as-text); }
+.aerosaga-shell.theme-dark table thead,
+.aerosaga-shell.theme-dark .table-head { background: var(--as-surface-soft); }
+.aerosaga-shell.theme-dark .empty-state,
+.aerosaga-shell.theme-dark .empty-icon,
+.aerosaga-shell.theme-dark .stat-icon,
+.aerosaga-shell.theme-dark .drone-avatar { color: var(--as-muted); }
+.aerosaga-shell.theme-dark .sidebar-status { background: #102b25; border-color: #1b5947; }
+.aerosaga-shell.theme-dark .sidebar-status strong { color: #86efac; }
+.aerosaga-shell.theme-dark .sidebar-status small { color: #a7d8bd; }
+.aerosaga-shell.theme-dark .user-avatar { background: #172f55; border-color: #28569a; color: #bfdbfe; }
+.aerosaga-shell.theme-dark .status-badge { filter: brightness(.9) saturate(.9); }
+.aerosaga-shell.theme-dark .button-ghost { background: var(--as-surface); border-color: var(--as-border); color: var(--as-text); }
+.aerosaga-shell.theme-dark .button-ghost:hover { background: var(--as-hover); }
+.aerosaga-shell.theme-dark .progress-track { background: #26364c; }
+.aerosaga-shell.theme-dark .mobile-scrim { background: rgb(0 0 0 / 65%); }
+.theme-toggle-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.theme-toggle-button { flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .aerosaga-shell .app-header { gap: 8px; }
+  .aerosaga-shell .header-actions { gap: 7px; }
+  .aerosaga-shell .theme-toggle-button, .aerosaga-shell .header-icon-button { width: 36px; height: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aerosaga-shell, .aerosaga-shell * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+
+/* Contrast fix: white sidebar navigation buttons remain readable in dark mode. */
+.aerosaga-shell.theme-dark .nav-link {
+  background: #ffffff;
+  color: #172033;
+  border-color: #dce5f2;
+}
+.aerosaga-shell.theme-dark .nav-link svg,
+.aerosaga-shell.theme-dark .nav-link .nav-icon {
+  color: #334155;
+  stroke: currentColor;
+}
+.aerosaga-shell.theme-dark .nav-link:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #172033;
+}
+.aerosaga-shell.theme-dark .nav-link:hover svg,
+.aerosaga-shell.theme-dark .nav-link:hover .nav-icon {
+  color: #1d4ed8;
+}
+.aerosaga-shell.theme-dark .nav-link.active {
+  background: #172f55;
+  border-color: #28569a;
+  color: #bfdbfe;
+  box-shadow: inset 3px 0 0 #2563eb, 0 3px 10px rgba(0, 0, 0, .16);
+}
+.aerosaga-shell.theme-dark .nav-link.active svg,
+.aerosaga-shell.theme-dark .nav-link.active .nav-icon {
+  color: #93c5fd;
+}
+
+
+/* ===== Dark theme: readable white content surfaces across EVERY page =====
+   Keep the application canvas/header/sidebar dark, while using white cards
+   and dark typography for readable content panels, forms, and data tables.
+*/
+.aerosaga-shell.theme-dark .panel,
+.aerosaga-shell.theme-dark .stat-card,
+.aerosaga-shell.theme-dark .detail-section,
+.aerosaga-shell.theme-dark .mission-card,
+.aerosaga-shell.theme-dark .queue-card,
+.aerosaga-shell.theme-dark .drone-card,
+.aerosaga-shell.theme-dark .history-card,
+.aerosaga-shell.theme-dark .notification-card,
+.aerosaga-shell.theme-dark .notification-item,
+.aerosaga-shell.theme-dark .analytics-card,
+.aerosaga-shell.theme-dark .profile-card,
+.aerosaga-shell.theme-dark .profile-panel,
+.aerosaga-shell.theme-dark .settings-card,
+.aerosaga-shell.theme-dark .settings-panel,
+.aerosaga-shell.theme-dark .form-card,
+.aerosaga-shell.theme-dark .table-wrap,
+.aerosaga-shell.theme-dark .mission-detail-panel,
+.aerosaga-shell.theme-dark .map-panel,
+.aerosaga-shell.theme-dark .tracking-summary {
+  background-color: #ffffff;
+  color: #172033;
+  border-color: #dce5f2;
+}
+
+/* Headings and important values on the white content surfaces */
+.aerosaga-shell.theme-dark .panel h1,
+.aerosaga-shell.theme-dark .panel h2,
+.aerosaga-shell.theme-dark .panel h3,
+.aerosaga-shell.theme-dark .panel h4,
+.aerosaga-shell.theme-dark .stat-card h1,
+.aerosaga-shell.theme-dark .stat-card h2,
+.aerosaga-shell.theme-dark .stat-card h3,
+.aerosaga-shell.theme-dark .stat-card strong,
+.aerosaga-shell.theme-dark .detail-section h1,
+.aerosaga-shell.theme-dark .detail-section h2,
+.aerosaga-shell.theme-dark .detail-section h3,
+.aerosaga-shell.theme-dark .detail-section h4,
+.aerosaga-shell.theme-dark .mission-card h1,
+.aerosaga-shell.theme-dark .mission-card h2,
+.aerosaga-shell.theme-dark .mission-card h3,
+.aerosaga-shell.theme-dark .queue-card h1,
+.aerosaga-shell.theme-dark .queue-card h2,
+.aerosaga-shell.theme-dark .queue-card h3,
+.aerosaga-shell.theme-dark .drone-card h1,
+.aerosaga-shell.theme-dark .drone-card h2,
+.aerosaga-shell.theme-dark .drone-card h3,
+.aerosaga-shell.theme-dark .history-card h1,
+.aerosaga-shell.theme-dark .history-card h2,
+.aerosaga-shell.theme-dark .history-card h3,
+.aerosaga-shell.theme-dark .notification-card h1,
+.aerosaga-shell.theme-dark .notification-card h2,
+.aerosaga-shell.theme-dark .notification-card h3,
+.aerosaga-shell.theme-dark .analytics-card h1,
+.aerosaga-shell.theme-dark .analytics-card h2,
+.aerosaga-shell.theme-dark .analytics-card h3,
+.aerosaga-shell.theme-dark .profile-card h1,
+.aerosaga-shell.theme-dark .profile-card h2,
+.aerosaga-shell.theme-dark .profile-card h3,
+.aerosaga-shell.theme-dark .settings-card h1,
+.aerosaga-shell.theme-dark .settings-card h2,
+.aerosaga-shell.theme-dark .settings-card h3,
+.aerosaga-shell.theme-dark .form-card h1,
+.aerosaga-shell.theme-dark .form-card h2,
+.aerosaga-shell.theme-dark .form-card h3,
+.aerosaga-shell.theme-dark .mission-detail-panel h1,
+.aerosaga-shell.theme-dark .mission-detail-panel h2,
+.aerosaga-shell.theme-dark .mission-detail-panel h3 {
+  color: #111827;
+}
+
+/* Supporting text and labels inside white panels */
+.aerosaga-shell.theme-dark .panel p,
+.aerosaga-shell.theme-dark .panel label,
+.aerosaga-shell.theme-dark .panel .muted,
+.aerosaga-shell.theme-dark .panel .eyebrow,
+.aerosaga-shell.theme-dark .panel .footnote,
+.aerosaga-shell.theme-dark .stat-card p,
+.aerosaga-shell.theme-dark .stat-card span,
+.aerosaga-shell.theme-dark .detail-section p,
+.aerosaga-shell.theme-dark .detail-section label,
+.aerosaga-shell.theme-dark .detail-section span,
+.aerosaga-shell.theme-dark .mission-card p,
+.aerosaga-shell.theme-dark .mission-card span,
+.aerosaga-shell.theme-dark .queue-card p,
+.aerosaga-shell.theme-dark .queue-card span,
+.aerosaga-shell.theme-dark .drone-card p,
+.aerosaga-shell.theme-dark .drone-card span,
+.aerosaga-shell.theme-dark .history-card p,
+.aerosaga-shell.theme-dark .history-card span,
+.aerosaga-shell.theme-dark .notification-card p,
+.aerosaga-shell.theme-dark .notification-card span,
+.aerosaga-shell.theme-dark .analytics-card p,
+.aerosaga-shell.theme-dark .analytics-card span,
+.aerosaga-shell.theme-dark .profile-card p,
+.aerosaga-shell.theme-dark .profile-card label,
+.aerosaga-shell.theme-dark .settings-card p,
+.aerosaga-shell.theme-dark .settings-card label,
+.aerosaga-shell.theme-dark .settings-panel p,
+.aerosaga-shell.theme-dark .settings-panel label,
+.aerosaga-shell.theme-dark .form-card p,
+.aerosaga-shell.theme-dark .form-card label,
+.aerosaga-shell.theme-dark .mission-detail-panel p,
+.aerosaga-shell.theme-dark .mission-detail-panel span {
+  color: #475569;
+}
+
+/* Form controls and table cells are consistent on all pages */
+.aerosaga-shell.theme-dark input,
+.aerosaga-shell.theme-dark textarea,
+.aerosaga-shell.theme-dark select {
+  background-color: #ffffff;
+  color: #172033;
+  border-color: #cbd5e1;
+}
+.aerosaga-shell.theme-dark input::placeholder,
+.aerosaga-shell.theme-dark textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+.aerosaga-shell.theme-dark table,
+.aerosaga-shell.theme-dark table th,
+.aerosaga-shell.theme-dark table td {
+  color: #172033;
+  border-color: #e2e8f0;
+}
+.aerosaga-shell.theme-dark table thead,
+.aerosaga-shell.theme-dark .table-head {
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+/* Preserve white text on primary/colored action buttons and colored status chips */
+.aerosaga-shell.theme-dark .button-primary,
+.aerosaga-shell.theme-dark .button-primary *,
+.aerosaga-shell.theme-dark .button-success,
+.aerosaga-shell.theme-dark .button-success *,
+.aerosaga-shell.theme-dark .status-badge,
+.aerosaga-shell.theme-dark .status-badge *,
+.aerosaga-shell.theme-dark .live-pill,
+.aerosaga-shell.theme-dark .live-pill * {
+  color: inherit;
+}
+.aerosaga-shell.theme-dark .progress-track { background-color: #e2e8f0; }
+.aerosaga-shell.theme-dark .detail-pair,
+.aerosaga-shell.theme-dark .detail-row,
+.aerosaga-shell.theme-dark .setting-row,
+.aerosaga-shell.theme-dark .health-row,
+.aerosaga-shell.theme-dark .activity-row {
+  border-color: #e2e8f0;
+}
