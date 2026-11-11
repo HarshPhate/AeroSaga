@@ -649,3 +649,159 @@ td small { color: #94a3b8; font-size: 9px; }
 .aerosaga-shell.theme-dark .nav-link.active .nav-icon {
   color: #93c5fd;
 }
+
+
+/* ===== Dark theme: readable white content surfaces across EVERY page =====
+   Keep the application canvas/header/sidebar dark, while using white cards
+   and dark typography for readable content panels, forms, and data tables.
+*/
+.aerosaga-shell.theme-dark .panel,
+.aerosaga-shell.theme-dark .stat-card,
+.aerosaga-shell.theme-dark .detail-section,
+.aerosaga-shell.theme-dark .mission-card,
+.aerosaga-shell.theme-dark .queue-card,
+.aerosaga-shell.theme-dark .drone-card,
+.aerosaga-shell.theme-dark .history-card,
+.aerosaga-shell.theme-dark .notification-card,
+.aerosaga-shell.theme-dark .notification-item,
+.aerosaga-shell.theme-dark .analytics-card,
+.aerosaga-shell.theme-dark .profile-card,
+.aerosaga-shell.theme-dark .profile-panel,
+.aerosaga-shell.theme-dark .settings-card,
+.aerosaga-shell.theme-dark .settings-panel,
+.aerosaga-shell.theme-dark .form-card,
+.aerosaga-shell.theme-dark .table-wrap,
+.aerosaga-shell.theme-dark .mission-detail-panel,
+.aerosaga-shell.theme-dark .map-panel,
+.aerosaga-shell.theme-dark .tracking-summary {
+  background-color: #ffffff;
+  color: #172033;
+  border-color: #dce5f2;
+}
+
+/* Headings and important values on the white content surfaces */
+.aerosaga-shell.theme-dark .panel h1,
+.aerosaga-shell.theme-dark .panel h2,
+.aerosaga-shell.theme-dark .panel h3,
+.aerosaga-shell.theme-dark .panel h4,
+.aerosaga-shell.theme-dark .stat-card h1,
+.aerosaga-shell.theme-dark .stat-card h2,
+.aerosaga-shell.theme-dark .stat-card h3,
+.aerosaga-shell.theme-dark .stat-card strong,
+.aerosaga-shell.theme-dark .detail-section h1,
+.aerosaga-shell.theme-dark .detail-section h2,
+.aerosaga-shell.theme-dark .detail-section h3,
+.aerosaga-shell.theme-dark .detail-section h4,
+.aerosaga-shell.theme-dark .mission-card h1,
+.aerosaga-shell.theme-dark .mission-card h2,
+.aerosaga-shell.theme-dark .mission-card h3,
+.aerosaga-shell.theme-dark .queue-card h1,
+.aerosaga-shell.theme-dark .queue-card h2,
+.aerosaga-shell.theme-dark .queue-card h3,
+.aerosaga-shell.theme-dark .drone-card h1,
+.aerosaga-shell.theme-dark .drone-card h2,
+.aerosaga-shell.theme-dark .drone-card h3,
+.aerosaga-shell.theme-dark .history-card h1,
+.aerosaga-shell.theme-dark .history-card h2,
+.aerosaga-shell.theme-dark .history-card h3,
+.aerosaga-shell.theme-dark .notification-card h1,
+.aerosaga-shell.theme-dark .notification-card h2,
+.aerosaga-shell.theme-dark .notification-card h3,
+.aerosaga-shell.theme-dark .analytics-card h1,
+.aerosaga-shell.theme-dark .analytics-card h2,
+.aerosaga-shell.theme-dark .analytics-card h3,
+.aerosaga-shell.theme-dark .profile-card h1,
+.aerosaga-shell.theme-dark .profile-card h2,
+.aerosaga-shell.theme-dark .profile-card h3,
+.aerosaga-shell.theme-dark .settings-card h1,
+.aerosaga-shell.theme-dark .settings-card h2,
+.aerosaga-shell.theme-dark .settings-card h3,
+.aerosaga-shell.theme-dark .form-card h1,
+.aerosaga-shell.theme-dark .form-card h2,
+.aerosaga-shell.theme-dark .form-card h3,
+.aerosaga-shell.theme-dark .mission-detail-panel h1,
+.aerosaga-shell.theme-dark .mission-detail-panel h2,
+.aerosaga-shell.theme-dark .mission-detail-panel h3 {
+  color: #111827;
+}
+
+/* Supporting text and labels inside white panels */
+.aerosaga-shell.theme-dark .panel p,
+.aerosaga-shell.theme-dark .panel label,
+.aerosaga-shell.theme-dark .panel .muted,
+.aerosaga-shell.theme-dark .panel .eyebrow,
+.aerosaga-shell.theme-dark .panel .footnote,
+.aerosaga-shell.theme-dark .stat-card p,
+.aerosaga-shell.theme-dark .stat-card span,
+.aerosaga-shell.theme-dark .detail-section p,
+.aerosaga-shell.theme-dark .detail-section label,
+.aerosaga-shell.theme-dark .detail-section span,
+.aerosaga-shell.theme-dark .mission-card p,
+.aerosaga-shell.theme-dark .mission-card span,
+.aerosaga-shell.theme-dark .queue-card p,
+.aerosaga-shell.theme-dark .queue-card span,
+.aerosaga-shell.theme-dark .drone-card p,
+.aerosaga-shell.theme-dark .drone-card span,
+.aerosaga-shell.theme-dark .history-card p,
+.aerosaga-shell.theme-dark .history-card span,
+.aerosaga-shell.theme-dark .notification-card p,
+.aerosaga-shell.theme-dark .notification-card span,
+.aerosaga-shell.theme-dark .analytics-card p,
+.aerosaga-shell.theme-dark .analytics-card span,
+.aerosaga-shell.theme-dark .profile-card p,
+.aerosaga-shell.theme-dark .profile-card label,
+.aerosaga-shell.theme-dark .settings-card p,
+.aerosaga-shell.theme-dark .settings-card label,
+.aerosaga-shell.theme-dark .settings-panel p,
+.aerosaga-shell.theme-dark .settings-panel label,
+.aerosaga-shell.theme-dark .form-card p,
+.aerosaga-shell.theme-dark .form-card label,
+.aerosaga-shell.theme-dark .mission-detail-panel p,
+.aerosaga-shell.theme-dark .mission-detail-panel span {
+  color: #475569;
+}
+
+/* Form controls and table cells are consistent on all pages */
+.aerosaga-shell.theme-dark input,
+.aerosaga-shell.theme-dark textarea,
+.aerosaga-shell.theme-dark select {
+  background-color: #ffffff;
+  color: #172033;
+  border-color: #cbd5e1;
+}
+.aerosaga-shell.theme-dark input::placeholder,
+.aerosaga-shell.theme-dark textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+.aerosaga-shell.theme-dark table,
+.aerosaga-shell.theme-dark table th,
+.aerosaga-shell.theme-dark table td {
+  color: #172033;
+  border-color: #e2e8f0;
+}
+.aerosaga-shell.theme-dark table thead,
+.aerosaga-shell.theme-dark .table-head {
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+/* Preserve white text on primary/colored action buttons and colored status chips */
+.aerosaga-shell.theme-dark .button-primary,
+.aerosaga-shell.theme-dark .button-primary *,
+.aerosaga-shell.theme-dark .button-success,
+.aerosaga-shell.theme-dark .button-success *,
+.aerosaga-shell.theme-dark .status-badge,
+.aerosaga-shell.theme-dark .status-badge *,
+.aerosaga-shell.theme-dark .live-pill,
+.aerosaga-shell.theme-dark .live-pill * {
+  color: inherit;
+}
+.aerosaga-shell.theme-dark .progress-track { background-color: #e2e8f0; }
+.aerosaga-shell.theme-dark .detail-pair,
+.aerosaga-shell.theme-dark .detail-row,
+.aerosaga-shell.theme-dark .setting-row,
+.aerosaga-shell.theme-dark .health-row,
+.aerosaga-shell.theme-dark .activity-row {
+  border-color: #e2e8f0;
+}
